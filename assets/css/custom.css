@@ -162,6 +162,33 @@
     border-color: var(--main-color) !important;
 }
 
+/* --- Programmes: remove orange see-through overlay on image hover ---
+   style.css sets background-color:orange on .program-block_one-image and
+   drops img opacity to 0.70 on hover, making the orange bleed through.
+   Override: transparent background + full opacity, keep the zoom. --- */
+.program-block_one-image {
+    background-color: transparent !important;
+}
+
+.program-block_one-inner:hover .program-block_one-image img {
+    opacity: 1 !important;
+}
+
+/* --- About Camp image: same zoom-on-hover behaviour as Who Can Join --- */
+.about-one_image {
+    overflow: hidden;
+}
+
+.about-one_image img {
+    display: block;
+    width: 100%;
+    transition: transform 0.55s ease;
+}
+
+.about-one_image-outer:hover .about-one_image img {
+    transform: scale(1.08);
+}
+
 /* --- Who Can Join: fill oval with image, professional zoom on hover, no orange overlay --- */
 .team-block_one-image img {
     width: 100%;
@@ -459,6 +486,16 @@
     mix-blend-mode: multiply;
 }
 
+/* --- Hero slider image column: add top clearance on desktop so the sticky header
+       + ticker don't clip through the top of the image.
+       .slider-one_content-inner already has padding-top:140px for the text side;
+       this mirrors that offset for the image column. --- */
+@media (min-width: 992px) {
+    .slider-one_image-outer {
+        padding-top: 50px;
+    }
+}
+
 /* --- Logo sizing: constrain PNG to match original SVG footprint --- */
 .main-header .header-lower .logo-box .logo img {
     max-height: 90px;
@@ -635,4 +672,332 @@
     line-height: 32px !important;
     opacity: 0.92 !important;
     font-weight: 400 !important;
+}
+
+/* ============================================================
+   Security Info Ticker — built into the navbar header-lower
+   ============================================================ */
+.header-sec-ticker {
+    display: flex;
+    align-items: stretch;
+    height: 36px;
+    overflow: hidden;
+    background: #002D45;
+    border-top: 1px solid rgba(244, 130, 31, 0.35);
+    border-bottom: 2px solid rgba(244, 130, 31, 0.55);
+}
+
+/* Left "SECURITY" badge */
+.hst-badge {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #f4821f;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    padding: 0 16px 0 14px;
+    white-space: nowrap;
+}
+.hst-badge i { font-size: 13px; }
+
+/* Chevron arrow separating badge from text */
+.hst-arrow {
+    flex-shrink: 0;
+    width: 0;
+    height: 0;
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+    border-left: 11px solid #f4821f;
+}
+
+/* Scrolling text area */
+.hst-track-wrap {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+}
+.hst-track {
+    display: flex;
+    white-space: nowrap;
+    animation: hstScroll 35s linear infinite;
+}
+.hst-track:hover { animation-play-state: paused; }
+
+.hst-item {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    letter-spacing: 0.15px;
+    padding-right: 60px;
+}
+.hst-item i {
+    color: #f4821f;
+    font-size: 12px;
+    margin-right: 2px;
+}
+
+@keyframes hstScroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hst-track { animation: none; }
+}
+
+/* ================================================================
+   RESPONSIVE DESIGN — Tablet · Mobile · Small Mobile
+   Breakpoints:
+     Tablet   : max-width 991px  (Bootstrap lg breakpoint)
+     Mobile   : max-width 767px  (Bootstrap md breakpoint)
+     Sm-Mobile: max-width 480px
+   ================================================================ */
+
+/* On mobile/tablet the theme's slide-in .mobile-menu handles navigation.
+   Hide both the Bootstrap toggler and the inline collapse so they don't
+   overlay page content. The theme JS copies the menu into .mobile-menu automatically. */
+.navbar-toggler {
+    display: none !important;
+}
+
+@media (max-width: 1023px) {
+    .main-menu .navbar-collapse {
+        display: none !important;
+    }
+
+    /* Also hide the inline Register Now pill — it appears inside the mobile menu */
+    .nav-outer .main-header_button {
+        display: none !important;
+    }
+
+    /* responsive.css paints .main-header orange. When fixed-header fires, .header-lower
+       goes position:fixed (dark navy) and leaves the flow — the orange wrapper stays visible
+       as a "ghost" duplicate behind it. Strip it; give .header-lower its own dark navy bg
+       so it looks correct even before the scroll threshold is hit. */
+    .main-header {
+        background-color: transparent !important;
+    }
+    .main-header .header-lower {
+        background-color: var(--color-four) !important;
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TABLET  ≤ 991px
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 991px) {
+
+    /* Security ticker: hide text label, keep shield icon */
+    .hst-badge span { display: none; }
+    .hst-badge { padding: 0 13px; gap: 0; }
+
+    /* Hero heading + text */
+    .slider-one_heading { font-size: 36px !important; line-height: 1.22 !important; }
+    .slider-one_text    { font-size: 17px !important; line-height: 28px !important; }
+
+    /* Hero widgets: tighter gap */
+    .hero-widgets-row { gap: 10px; margin-top: 22px; }
+
+    /* Logo: slightly smaller on tablet */
+    .main-header .header-lower .logo-box .logo img              { max-height: 74px; }
+    .main-header.fixed-header .header-lower .logo-box .logo img { max-height: 58px; }
+
+    /* Section headings: step down */
+    .sec-title_heading { font-size: 32px !important; }
+
+    /* Pricing card amounts: step down slightly */
+    .pricing-amount { font-size: 34px !important; }
+
+    /* Registration: section cards slightly less padding */
+    .reg-section-card { padding: 26px 22px !important; }
+
+    /* Programme badge circle: tighter on narrow screens */
+    .program-block_one-date { width: 60px !important; height: 60px !important; top: -30px !important; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MOBILE  ≤ 767px
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 767px) {
+
+    /* ── Security ticker ── */
+    .header-sec-ticker { height: 30px; }
+    .hst-arrow         { border-top-width: 15px; border-bottom-width: 15px; border-left-width: 9px; }
+    .hst-badge         { padding: 0 10px; }
+    .hst-badge i       { font-size: 11px; }
+    .hst-item          { font-size: 12px; padding-right: 38px; }
+
+    /* ── Logo ── */
+    .main-header .header-lower .logo-box .logo img              { max-height: 60px; }
+    .main-header.fixed-header .header-lower .logo-box .logo img { max-height: 50px; }
+    .mobile-menu .nav-logo img                                   { max-height: 64px; }
+    .footer-logo img                                             { max-height: 72px; }
+
+    /* ── About Camp: override responsive.css which puts content first (order:1) and
+       image second (order:2) — flip so image is on top ── */
+    .about-one_image-column   { order: 1 !important; }
+    .about-one_content-column { order: 2 !important; }
+
+    /* ── Hero: image on top, content below on mobile ── */
+    .slider-one .row.clearfix {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    .slider-one_image-column {
+        order: -1;
+    }
+    .slider-one_content {
+        order: 1;
+    }
+
+    /* ── Hero heading + text ── */
+    .slider-one_heading { font-size: 27px !important; line-height: 1.28 !important; }
+    .slider-one_text    { font-size: 15px !important; line-height: 24px !important; }
+    .slider-one_title   { font-size: 12px !important; }
+
+    /* Hero CTA row already has flex-wrap — just ensure gap is comfortable */
+    .slider-one_button { gap: 12px !important; }
+
+    /* ── Hero widget cards: stack vertically ── */
+    .hero-widgets-row         { flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 16px; }
+    .slider-one_booking       { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+    .hero-seats-card          { min-width: 0; width: 100%; max-width: 200px; padding: 12px 18px; }
+    .hero-seats-card_count    { font-size: 30px; }
+
+    /* ── Section headings ── */
+    .sec-title_heading { font-size: 25px !important; line-height: 1.32 !important; }
+    .sec-title_title   { font-size: 12px !important; }
+    .sec-title_text    { font-size: 15px !important; }
+
+    /* ── Choose Us card titles ── */
+    .choose-block_one-title { font-size: 17px !important; }
+
+    /* ── Page title bar ── */
+    .page-title h2 { font-size: 26px !important; }
+
+    /* ── Pricing cards: reduce inner padding + shrink the 42px amounts ── */
+    #pricing > .auto-container > .row.clearfix > [class*="col-"] > div { padding: 28px 20px !important; }
+    .pricing-amount { font-size: 30px !important; }
+
+    /* ── Family discount section: reduce outer + inner card padding ── */
+    .family-discount-wrap { padding: 28px 20px !important; border-radius: 16px !important; }
+    #pricing .family-discount-card { padding: 22px 18px !important; }
+
+    /* ── Register page ── */
+    .register-one { padding: 50px 0 60px !important; }
+    .register-one h3 { font-size: 24px !important; }
+    .register-one .text { font-size: 15px !important; }
+
+    /* "How Many Children" dark gradient card */
+    .reg-children-card {
+        padding: 22px 18px !important;
+        border-radius: 12px !important;
+        margin-bottom: 24px !important;
+    }
+
+    /* Child section header bar */
+    .reg-child-header {
+        padding: 16px 18px !important;
+        gap: 13px !important;
+        border-radius: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    /* Light-blue / amber section cards */
+    .reg-section-card {
+        padding: 20px 16px !important;
+        border-radius: 12px !important;
+        margin-bottom: 18px !important;
+    }
+    .reg-section-card h4 { font-size: 16px !important; margin-bottom: 18px !important; }
+
+    /* Child count selector pills */
+    .cc-btn { padding: 10px 18px !important; font-size: 13px !important; }
+
+    /* Family discount hint inside the children card */
+    #family-discount-hint {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        padding: 11px 14px !important;
+    }
+
+    /* Submit button: full width */
+    #registration-form button[type="submit"] { width: 100% !important; min-width: 0 !important; }
+
+    /* ── Registration: medical info textarea placeholders — center on mobile ── */
+    .register-form .form-group textarea::placeholder {
+        text-align: center;
+        font-size: 13px !important;
+    }
+    .register-form .form-group textarea {
+        text-align: center;
+    }
+    .register-form .form-group textarea:focus {
+        text-align: left;
+    }
+    .register-form .form-group textarea:focus::placeholder {
+        text-align: left;
+    }
+
+    /* ── Contact info cards ── */
+    .contact-info .info-block_two { margin-bottom: 20px; }
+
+    /* ── Footer ── */
+    .main-footer .footer-text { font-size: 14px; }
+
+    /* ── Admin topbar ── */
+    .topbar { padding: 0 14px !important; height: 56px !important; }
+    .topbar-brand span { font-size: 13px; }
+    .topbar-right { gap: 10px; font-size: 12px; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SMALL MOBILE  ≤ 480px
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 480px) {
+
+    /* ── Security ticker: most compact ── */
+    .hst-item       { font-size: 11px; padding-right: 26px; }
+    .hst-track-wrap { padding-left: 8px; }
+
+    /* ── Hero ── */
+    .slider-one_heading { font-size: 22px !important; line-height: 1.32 !important; }
+    .slider-one_text    { font-size: 14px !important; line-height: 22px !important; }
+    .slider-one_booking { padding: 10px 14px !important; }
+    .hero-seats-card    { padding: 11px 16px; }
+
+    /* ── Section headings ── */
+    .sec-title_heading { font-size: 21px !important; }
+
+    /* ── Pricing amounts ── */
+    #pricing > .auto-container > .row.clearfix > [class*="col-"] > div { padding: 22px 16px !important; }
+    .pricing-amount { font-size: 26px !important; }
+    .family-discount-wrap { padding: 22px 14px !important; }
+
+    /* ── Registration page ── */
+    .register-one h3  { font-size: 21px !important; }
+    .register-one .text { font-size: 14px !important; }
+
+    /* ── Registration cards: tightest padding ── */
+    .reg-children-card { padding: 18px 14px !important; }
+    .reg-child-header  { padding: 14px 14px !important; }
+    .reg-section-card  { padding: 18px 13px !important; }
+
+    /* cc-btn: most compact */
+    .cc-btn { padding: 9px 14px !important; font-size: 12px !important; }
+
+    /* ── Admin: hide brand text on very small screens ── */
+    .topbar-brand span { display: none; }
+    .topbar            { padding: 0 12px !important; }
+    .topbar-brand img  { height: 34px; }
+    .stats-grid        { grid-template-columns: 1fr 1fr !important; }
 }

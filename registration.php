@@ -96,7 +96,7 @@ include('includes/navbar.php');
 						<input type="hidden" name="number_of_children" id="number_of_children" value="1">
 
 						<!-- ===== HOW MANY CHILDREN? ===== -->
-						<div style="background:linear-gradient(135deg,#002D45,#01415b);border-radius:16px;padding:30px 32px;margin-bottom:35px;color:#fff;">
+						<div class="reg-children-card" style="background:linear-gradient(135deg,#002D45,#01415b);border-radius:16px;padding:30px 32px;margin-bottom:35px;color:#fff;">
 							<div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
 								<div style="width:50px;height:50px;background:rgba(244,130,31,0.22);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
 									<i class="fa-solid fa-users" style="color:#f4821f;font-size:20px;"></i>
@@ -120,7 +120,7 @@ include('includes/navbar.php');
 						<div id="child-sections-container"></div>
 
 						<!-- ===== PARENT / GUARDIAN INFORMATION ===== -->
-						<div style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:30px;border-left:4px solid #002D45;">
+						<div class="reg-section-card" style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:30px;border-left:4px solid #002D45;">
 							<h4 style="margin-bottom:25px;color:#1a1a2e;font-size:20px;"><i class="flaticon-team" style="color:#002D45;margin-right:10px;"></i> Parent / Guardian Information</h4>
 							<div class="row clearfix">
 
@@ -164,7 +164,7 @@ include('includes/navbar.php');
 						</div>
 
 						<!-- ===== PACKAGE SELECTION ===== -->
-						<div style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:30px;border-left:4px solid #9b59b6;">
+						<div class="reg-section-card" style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:30px;border-left:4px solid #9b59b6;">
 							<h4 style="margin-bottom:6px;color:#1a1a2e;font-size:20px;"><i class="flaticon-trophy" style="color:#9b59b6;margin-right:10px;"></i> Package Selection</h4>
 							<div id="pkg-section-label" style="font-size:13px;color:#888;font-weight:500;margin-bottom:22px;"></div>
 							<div class="row clearfix">
@@ -212,7 +212,7 @@ include('includes/navbar.php');
 						</div>
 
 						<!-- ===== CONSENT & AGREEMENT ===== -->
-						<div style="background:#fff9e6;border-radius:15px;padding:30px;margin-bottom:30px;border-left:4px solid #f39c12;">
+						<div class="reg-section-card" style="background:#fff9e6;border-radius:15px;padding:30px;margin-bottom:30px;border-left:4px solid #f39c12;">
 							<h4 style="margin-bottom:20px;color:#1a1a2e;font-size:20px;"><i class="flaticon-checked" style="color:#f39c12;margin-right:10px;"></i> Consent &amp; Agreement</h4>
 							<div style="font-size:15px;line-height:1.8;color:#333;">
 
@@ -424,6 +424,46 @@ include('includes/navbar.php');
 	letter-spacing: 0.5px;
 	margin-bottom: 8px;
 }
+
+/* ── Registration page responsive ── */
+@media (max-width: 767px) {
+	/* Courses dropdown: prevent overflow beyond viewport */
+	.courses-dd-menu {
+		max-height: 200px;
+		left: 0;
+		right: 0;
+		min-width: 0;
+	}
+	/* Package cards: equal gap on single-column stack */
+	#pkg-early-bird,
+	#pkg-standard,
+	#pkg-premium { margin-bottom: 12px; }
+	/* Form field font: match reduced size */
+	.register-form .form-group input[type="text"],
+	.register-form .form-group input[type="email"],
+	.register-form .form-group input[type="tel"],
+	.register-form .form-group input[type="date"],
+	.register-form .form-group select,
+	.register-form .form-group textarea { font-size: 14px; height: 48px; }
+	/* Step counter text inside children card */
+	.reg-children-card [style*="font-size:19px"],
+	.reg-children-card [style*="font-size: 19px"] { font-size: 15px !important; }
+}
+
+@media (max-width: 480px) {
+	/* Very small screens: tighter track select */
+	.track-select-wrap .custom-select-box { font-size: 13px; }
+	.courses-dd-trigger { font-size: 13px; height: 46px; }
+	/* Form fields: compact height */
+	.register-form .form-group input[type="text"],
+	.register-form .form-group input[type="email"],
+	.register-form .form-group input[type="tel"],
+	.register-form .form-group input[type="date"],
+	.register-form .form-group select,
+	.register-form .form-group textarea { font-size: 13px; height: 46px; padding: 8px 14px; }
+	/* Consent checkboxes: tighter */
+	.reg-section-card label { gap: 10px !important; }
+}
 </style>
 
 <script>
@@ -538,7 +578,7 @@ function childSectionHTML(i, showDivider) {
 		'<div class="child-group" id="child-group-' + i + '" style="animation:childSlideIn 0.45s ease ' + delay + 's both;">' +
 
 		/* ---- child header ---- */
-		'<div style="display:flex;align-items:center;gap:18px;margin-bottom:26px;padding:20px 26px;background:linear-gradient(135deg,#002D45,#01415b);border-radius:14px;color:#fff;">' +
+		'<div class="reg-child-header" style="display:flex;align-items:center;gap:18px;margin-bottom:26px;padding:20px 26px;background:linear-gradient(135deg,#002D45,#01415b);border-radius:14px;color:#fff;">' +
 			'<div style="width:52px;height:52px;border-radius:50%;background:#f4821f;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex-shrink:0;box-shadow:0 4px 14px rgba(244,130,31,0.42);">' + num + '</div>' +
 			'<div>' +
 				'<div style="font-size:11px;opacity:0.6;text-transform:uppercase;letter-spacing:1.3px;margin-bottom:3px;">' + ordinal + ' Child</div>' +
@@ -547,7 +587,7 @@ function childSectionHTML(i, showDivider) {
 		'</div>' +
 
 		/* ---- student info ---- */
-		'<div style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:20px;border-left:4px solid #f4821f;">' +
+		'<div class="reg-section-card" style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:20px;border-left:4px solid #f4821f;">' +
 			'<h4 style="margin-bottom:25px;color:#1a1a2e;font-size:18px;font-weight:700;"><i class="flaticon-user" style="color:#f4821f;margin-right:10px;"></i> Student Information</h4>' +
 			'<div class="row clearfix">' +
 				'<div class="col-lg-4 col-md-6 col-sm-12 form-group"><label>First Name <span style="color:#e74c3c;">*</span></label><input type="text" name="first_name[' + i + ']" maxlength="100" required></div>' +
@@ -567,7 +607,7 @@ function childSectionHTML(i, showDivider) {
 		'</div>' +
 
 		/* ---- camp participation ---- */
-		'<div style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:20px;border-left:4px solid #f4821f;">' +
+		'<div class="reg-section-card" style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:20px;border-left:4px solid #f4821f;">' +
 			'<h4 style="margin-bottom:25px;color:#1a1a2e;font-size:18px;font-weight:700;"><i class="flaticon-leader" style="color:#f4821f;margin-right:10px;"></i> Camp Participation Details</h4>' +
 			'<div class="row clearfix">' +
 				'<div class="col-lg-6 col-md-12 col-sm-12 form-group"><label>Primary Learning Track <span style="color:#e74c3c;">*</span></label>' +
@@ -595,7 +635,7 @@ function childSectionHTML(i, showDivider) {
 		'</div>' +
 
 		/* ---- medical info ---- */
-		'<div style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:20px;border-left:4px solid #e74c3c;">' +
+		'<div class="reg-section-card" style="background:#f8f9ff;border-radius:15px;padding:30px;margin-bottom:20px;border-left:4px solid #e74c3c;">' +
 			'<h4 style="margin-bottom:25px;color:#1a1a2e;font-size:18px;font-weight:700;"><i class="flaticon-happiness" style="color:#e74c3c;margin-right:10px;"></i> Medical Information</h4>' +
 			'<div class="row clearfix">' +
 				'<div class="col-lg-6 col-md-12 col-sm-12 form-group"><label>Medical Condition (if any)</label><textarea name="medical_condition[' + i + ']" rows="3" placeholder="Describe any known medical conditions, or write \'None\'"></textarea></div>' +

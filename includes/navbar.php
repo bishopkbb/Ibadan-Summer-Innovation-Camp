@@ -68,6 +68,31 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Security Ticker Strip — part of the navbar -->
+			<div class="header-sec-ticker" role="region" aria-label="Security Notice">
+				<div class="hst-badge">
+					<i class="fa-solid fa-shield-halved"></i>
+					<span>SECURITY</span>
+				</div>
+				<div class="hst-arrow"></div>
+				<div class="hst-track-wrap">
+					<div class="hst-track">
+						<span class="hst-item">
+							<i class="fa-solid fa-circle-check"></i>&nbsp;
+							Professional Security Available &nbsp;&mdash;&nbsp; Trained security personnel will be present throughout the camp to ensure a safe, secure, and supervised learning environment for all participants.
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						</span>
+						<span class="hst-item" aria-hidden="true">
+							<i class="fa-solid fa-circle-check"></i>&nbsp;
+							Professional Security Available &nbsp;&mdash;&nbsp; Trained security personnel will be present throughout the camp to ensure a safe, secure, and supervised learning environment for all participants.
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						</span>
+					</div>
+				</div>
+			</div>
+			<!-- End Security Ticker Strip -->
+
 		</div>
 		<!--End Header Lower-->
 
@@ -85,45 +110,6 @@
 
 	</header>
 	<!-- End Main Header -->
-
-	<!-- Security Info Ticker -->
-	<div id="sec-ticker" role="region" aria-label="Security Notice">
-		<div class="sec-ticker-badge">
-			<i class="fa-solid fa-shield-halved"></i>
-			<span>SECURITY</span>
-		</div>
-		<div class="sec-ticker-arrow"></div>
-		<div class="sec-ticker-track-wrap">
-			<div class="sec-ticker-track">
-				<span class="sec-ticker-item">
-					<i class="fa-solid fa-circle-check"></i>&nbsp;
-					Professional Security Available &nbsp;&mdash;&nbsp; Trained security personnel will be present throughout the camp to ensure a safe, secure, and supervised learning environment for all participants.
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				</span>
-				<span class="sec-ticker-item" aria-hidden="true">
-					<i class="fa-solid fa-circle-check"></i>&nbsp;
-					Professional Security Available &nbsp;&mdash;&nbsp; Trained security personnel will be present throughout the camp to ensure a safe, secure, and supervised learning environment for all participants.
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				</span>
-			</div>
-		</div>
-	</div>
-	<!-- End Security Ticker -->
-	<script>
-	(function() {
-		var banner = document.getElementById('sec-ticker');
-		if (!banner) return;
-		function reposition() {
-			var hdr   = document.querySelector('.main-header');
-			var lower = hdr ? hdr.querySelector('.header-lower') : null;
-			if (!lower) return;
-			banner.style.top = lower.offsetHeight + 'px';
-		}
-		reposition();
-		window.addEventListener('scroll', reposition, { passive: true });
-		window.addEventListener('resize', reposition);
-	})();
-	</script>
 
 	<!-- About Sidebar -->
 	<div class="about-sidebar">

@@ -279,11 +279,35 @@ tbody tr:hover td { background: #fafbff; }
 .status-form select { height: 30px; padding: 0 8px; border: 1px solid #dde1ea; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; background: #f8f9ff; }
 .status-form button { height: 30px; padding: 0 12px; font-size: 12px; }
 
-/* ── Responsive ── */
+/* ── Responsive: tablet ── */
+@media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── Responsive: mobile ── */
 @media (max-width: 600px) {
-    .topbar { padding: 0 14px; }
+    .topbar { padding: 0 14px; height: 54px; }
+    .topbar-brand span { font-size: 13px; }
+    .topbar-right { gap: 10px; font-size: 12px; }
     .main { padding: 16px 14px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .filter-bar { padding: 14px 14px; }
     .filter-bar form { flex-direction: column; }
+    .fb-group select,
+    .fb-group input[type=text] { min-width: 0; width: 100%; }
+    .card-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .tabs { flex-wrap: wrap; }
+    .tab-btn { flex: 1; text-align: center; padding: 8px 14px; }
+}
+
+/* ── Responsive: small mobile ── */
+@media (max-width: 400px) {
+    .topbar-brand span { display: none; }
+    .topbar { padding: 0 10px; }
+    .topbar-brand img { height: 34px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stat-value { font-size: 26px; }
+    .topbar-right a:first-child { display: none; }
 }
 </style>
 </head>

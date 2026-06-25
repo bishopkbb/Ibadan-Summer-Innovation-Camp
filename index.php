@@ -261,9 +261,9 @@ include('includes/navbar.php');
 				<div class="service-block_one col-lg-3 col-md-6 col-sm-12">
 					<div class="service-block_one-inner wow fadeInLeft" data-wow-delay="450ms" data-wow-duration="1500ms">
 						<div class="service-block_one-stars" style="background-image:url(assets/images/icons/icon-1.png)"></div>
-						<div class="service-block_one-icon"><i class="flaticon-maps-and-flags"></i></div>
-						<h5 class="service-block_one-title"><a href="contact.php">Ibadan, Oyo State</a></h5>
-						<div class="service-block_one-text">Traceworka Innovative Solutions, Kongi-Bodija, Ibadan — a safe, equipped, and inspiring venue.</div>
+						<div class="service-block_one-icon"><i class="flaticon-padlock"></i></div>
+						<h5 class="service-block_one-title"><a href="#about">Professional Security</a></h5>
+						<div class="service-block_one-text">Trained security personnel present throughout the camp to ensure a safe, secure, and supervised environment for all participants.</div>
 					</div>
 				</div>
 
@@ -724,7 +724,7 @@ include('includes/navbar.php');
 							<span style="color:#1a1a2e;font-size:12.5px;font-weight:600;line-height:1.3;">Offer ends: <strong style="color:#e06800;">19th July, 2026</strong></span>
 						</div>
 						<?php endif; ?>
-						<div style="font-size:42px;font-weight:800;color:<?php echo $early_bird_expired ? '#ccc' : '#f4821f'; ?>;margin:15px 0;<?php echo $early_bird_expired ? 'text-decoration:line-through;' : ''; ?>">&#8358;45,000</div>
+						<div class="pricing-amount" style="font-size:42px;font-weight:800;color:<?php echo $early_bird_expired ? '#ccc' : '#f4821f'; ?>;margin:15px 0;<?php echo $early_bird_expired ? 'text-decoration:line-through;' : ''; ?>">&#8358;45,000</div>
 						<ul style="list-style:none;padding:0;margin:20px 0;text-align:left;">
 							<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><i class="flaticon-checked" style="color:<?php echo $early_bird_expired ? '#ccc' : '#f4821f'; ?>;margin-right:8px;"></i> Full Camp Access</li>
 							<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><i class="flaticon-checked" style="color:<?php echo $early_bird_expired ? '#ccc' : '#f4821f'; ?>;margin-right:8px;"></i> Learning Materials</li>
@@ -753,7 +753,7 @@ include('includes/navbar.php');
 							<img src="assets/images/icons/price-icon.png" alt="" style="height:50px;">
 						</div>
 						<h4 style="font-size:22px;font-weight:700;margin-bottom:5px;color:#fff;">Standard Package</h4>
-						<div style="font-size:42px;font-weight:800;color:#fff;margin:15px 0;">&#8358;55,000</div>
+						<div class="pricing-amount" style="font-size:42px;font-weight:800;color:#fff;margin:15px 0;">&#8358;55,000</div>
 						<ul style="list-style:none;padding:0;margin:20px 0;text-align:left;color:#fff;">
 							<li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.2);"><i class="flaticon-checked" style="color:#fff;margin-right:8px;"></i> Full Camp Access</li>
 							<li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.2);"><i class="flaticon-checked" style="color:#fff;margin-right:8px;"></i> Learning Materials</li>
@@ -777,7 +777,7 @@ include('includes/navbar.php');
 							<img src="assets/images/icons/price-icon.png" alt="" style="height:50px;">
 						</div>
 						<h4 style="font-size:22px;font-weight:700;margin-bottom:5px;color:#1a1a2e;">Premium Package</h4>
-						<div style="font-size:42px;font-weight:800;color:#f4821f;margin:15px 0;">&#8358;70,000</div>
+						<div class="pricing-amount" style="font-size:42px;font-weight:800;color:#f4821f;margin:15px 0;">&#8358;70,000</div>
 						<ul style="list-style:none;padding:0;margin:20px 0;text-align:left;">
 							<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><i class="flaticon-checked" style="color:#f4821f;margin-right:8px;"></i> Full Camp Access</li>
 							<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><i class="flaticon-checked" style="color:#f4821f;margin-right:8px;"></i> Learning Materials</li>
@@ -801,7 +801,7 @@ include('includes/navbar.php');
 			<!-- Family Discount -->
 			<div class="row clearfix" style="margin-top:40px;">
 				<div class="col-lg-12">
-					<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:20px;padding:40px;color:#fff;text-align:center;">
+					<div class="family-discount-wrap" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:20px;padding:40px;color:#fff;text-align:center;">
 						<div class="sec-title centered" style="margin-bottom:30px;">
 							<div class="sec-title_title" style="color:#f4821f;">Family &amp; Group Discounts</div>
 							<h2 class="sec-title_heading" style="color:#fff;">Save More When You Register <span>Together</span></h2>
