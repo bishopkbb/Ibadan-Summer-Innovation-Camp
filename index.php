@@ -2,7 +2,7 @@
 session_start();
 require_once('config/db.php');
 
-$total_seats = 100;
+$total_seats = 103;
 $seats_remaining = $total_seats;
 try {
     $conn = getDBConnection();
