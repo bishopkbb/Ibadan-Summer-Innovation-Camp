@@ -1,0 +1,638 @@
+/* ============================================================
+   Ibadan Summer Innovation Camp 2026 — Custom Overrides
+   ============================================================ */
+
+/* --- Pricing cards: equal height + lift-on-hover across all three packages --- */
+#pricing > .auto-container > .row.clearfix {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+#pricing > .auto-container > .row.clearfix > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
+}
+
+#pricing > .auto-container > .row.clearfix > [class*="col-"] > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.38s ease !important;
+    will-change: transform;
+}
+
+#pricing > .auto-container > .row.clearfix > [class*="col-"] > div > ul {
+    flex: 1;
+}
+
+/* White cards lift with a deeper neutral shadow */
+#pricing > .auto-container > .row.clearfix > [class*="col-"]:hover > div {
+    transform: translateY(-12px);
+    box-shadow: 0 28px 65px rgba(0, 0, 0, 0.14) !important;
+}
+
+/* Standard (orange) card lifts with an orange-tinted shadow */
+#pricing > .auto-container > .row.clearfix > [class*="col-"]:nth-child(2):hover > div {
+    transform: translateY(-12px);
+    box-shadow: 0 28px 65px rgba(244, 130, 31, 0.48) !important;
+}
+
+/* --- Family & Group Discounts: equal-height cards --- */
+.family-discount-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.family-discount-row > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.family-discount-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --- Footer socials: orange background + blue icon on hover --- */
+.footer_socials a:hover {
+    background-color: var(--main-color) !important;
+    border-color: var(--main-color) !important;
+    color: var(--color-four) !important;
+}
+
+/* --- Footer bottom: full white copyright and powered-by text --- */
+.footer-bottom .copyright,
+.footer-bottom .designs_by {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* --- Footer: all link hovers turn orange --- */
+.footer-list li a:hover {
+    color: var(--main-color) !important;
+}
+
+/* ============================================================
+   Contact Page
+   ============================================================ */
+
+/* Equal-height info cards */
+.contact-info .row.clearfix {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.contact-info .info-block_two {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-info .info-block_two-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Form intro text: remove faint opacity */
+.contact-form-section .form-column .text {
+    font-size: 15px !important;
+    opacity: 1 !important;
+    color: #555 !important;
+}
+
+/* Contact form fields: white bg, visible border, readable text */
+.contact-form .form-group input[type="text"],
+.contact-form .form-group input[type="email"],
+.contact-form .form-group input[type="tel"],
+.contact-form .form-group select,
+.contact-form .form-group textarea {
+    background-color: #ffffff !important;
+    color: #1a1a2e !important;
+    border: 1.5px solid #dde1ea !important;
+    border-radius: 8px !important;
+    font-size: 15px !important;
+    height: 52px !important;
+    padding: 10px 18px !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.contact-form .form-group textarea {
+    height: auto !important;
+    resize: vertical;
+}
+
+.contact-form .form-group input::placeholder,
+.contact-form .form-group textarea::placeholder {
+    color: #b0b7c3 !important;
+    font-size: 14px;
+}
+
+.contact-form .form-group input:focus,
+.contact-form .form-group select:focus,
+.contact-form .form-group textarea:focus {
+    border-color: var(--main-color) !important;
+    box-shadow: 0 0 0 3px rgba(244, 130, 31, 0.12) !important;
+    outline: none;
+}
+
+.contact-form .form-group {
+    margin-bottom: 20px;
+}
+
+/* --- Get In Touch: push walking-figure pattern below the contact list so it stands alone --- */
+#contact-quick .registration-one_pattern {
+    bottom: -60px;
+}
+
+/* --- Final CTA: orange border reveals on hover against the dark navy overlay --- */
+.final-cta-btn {
+    border: 2px solid transparent;
+    transition: border-color 0.4s ease;
+}
+
+.final-cta-btn:hover {
+    border-color: var(--main-color) !important;
+}
+
+/* --- Who Can Join: fill oval with image, professional zoom on hover, no orange overlay --- */
+.team-block_one-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transition: transform 0.55s ease;
+}
+
+.team-block_one-overlay {
+    display: none !important;
+}
+
+.team-block_one-inner:hover .team-block_one-image img {
+    transform: scale(1.08);
+}
+
+/* ============================================================
+   Form Validation States (all forms)
+   ============================================================ */
+
+.v-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.10) !important;
+}
+
+.v-ok {
+    border-color: #2ecc71 !important;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.08) !important;
+}
+
+.v-msg {
+    display: block;
+    font-size: 12px;
+    color: #e74c3c;
+    font-weight: 600;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.v-cb-error {
+    color: #e74c3c !important;
+    opacity: 1 !important;
+}
+
+.v-banner {
+    background: #fff5f5;
+    border: 1.5px solid #f5c6cb;
+    color: #721c24;
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   Registration Page — Full Typography & Field Overhaul
+   ============================================================ */
+
+/* Page intro */
+.register-one h3 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.register-one .text {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.65;
+}
+
+.register-one .text a {
+    color: var(--main-color);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Section cards */
+.register-one .register-form > form > div[style*="background:#f8f9ff"],
+.register-one .register-form > form > div[style*="background:#fff9e6"] {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Section headings */
+.register-one .register-form h4 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.2px;
+}
+
+/* Override theme's 50% opacity on ALL register-form labels */
+.register-form label {
+    color: #1a1a2e !important;
+    opacity: 1 !important;
+}
+
+/* Form labels: dark and readable on light backgrounds */
+.register-form .form-group label {
+    display: block;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #1a1a2e !important;
+    opacity: 1 !important;
+    margin-bottom: 8px;
+    letter-spacing: 0.15px;
+}
+
+/* Inputs, selects, textareas */
+.register-form .form-group input[type="text"],
+.register-form .form-group input[type="email"],
+.register-form .form-group input[type="tel"],
+.register-form .form-group input[type="date"],
+.register-form .form-group select,
+.register-form .form-group textarea {
+    display: block;
+    width: 100%;
+    height: 52px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #1a1a2e;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1.5px solid #dde1ea;
+    background-color: #ffffff;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.register-form .form-group textarea {
+    height: auto;
+    resize: vertical;
+}
+
+.register-form .form-group input::placeholder,
+.register-form .form-group textarea::placeholder {
+    color: #b0b7c3;
+    font-size: 14px;
+}
+
+.register-form .form-group input:focus,
+.register-form .form-group select:focus,
+.register-form .form-group textarea:focus {
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 3px rgba(244, 130, 31, 0.12);
+    outline: none;
+}
+
+/* Form group spacing */
+.register-form .form-group {
+    margin-bottom: 22px;
+}
+
+/* --- Programmes: fit "Track" label + number inside the orange circle badge --- */
+.program-block_one-date {
+    width: 68px !important;
+    height: 68px !important;
+    top: -34px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding-top: 10px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.2 !important;
+}
+
+.program-block_one-date span {
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    display: block;
+}
+
+/* --- Programmes: equal-height cards across all slides --- */
+.program-one_carousel .swiper-wrapper {
+    align-items: stretch;
+}
+.program-one_carousel .swiper-slide {
+    height: auto;
+}
+.program-block_one,
+.program-block_one-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.program-block_one-image {
+    flex-shrink: 0;
+}
+.program-block_one-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.program-block_one-text {
+    flex: 1;
+}
+
+/* --- Why Choose Us: reduce card headings from h2 default (48px) to fit all titles --- */
+.choose-block_one-title {
+    font-size: 20px !important;
+    line-height: 1.3 !important;
+}
+
+/* --- Camp Experience: equal-height week cards --- */
+#camp-journey .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+#camp-journey .choose-block_one {
+    display: flex;
+}
+#camp-journey .choose-block_one-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+#camp-journey .choose-block_one-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+#camp-journey .choose-block_one-text {
+    flex: 1;
+}
+
+/* --- Camp Highlights: equal-height cards --- */
+.services-one .service-block_one {
+    display: flex;
+    flex-direction: column;
+}
+
+.services-one .service-block_one-inner {
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Orange background sweep on hover — same pattern as Why Choose Us cards */
+.services-one .service-block_one-inner::before {
+    position: absolute;
+    content: '';
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    transform: scale(1, 0.2);
+    transition: all 500ms ease;
+    -webkit-transition: all 500ms ease;
+    background-color: var(--color-two);
+}
+
+.services-one .service-block_one-inner:hover::before {
+    opacity: 1;
+    transform: scale(1, 1);
+}
+
+.services-one .service-block_one-title,
+.services-one .service-block_one-title a {
+    transition: color 500ms ease;
+}
+
+.services-one .service-block_one-inner:hover .service-block_one-title,
+.services-one .service-block_one-inner:hover .service-block_one-title a {
+    color: var(--white-color);
+}
+
+.services-one .service-block_one-text {
+    transition: color 500ms ease;
+}
+
+.services-one .service-block_one-inner:hover .service-block_one-text {
+    color: var(--white-color);
+}
+
+/* --- Hero CTA buttons: orange border appears on hover, matching navbar Register Now pill --- */
+.slider-one_button .theme-btn {
+    border: 2px solid transparent;
+    transition: border-color 0.4s ease;
+}
+
+.slider-one_button .theme-btn:hover {
+    border-color: var(--main-color) !important;
+}
+
+/* --- Hero slider image: remove white background via multiply blend on dark navy slide bg --- */
+.slider-one_image img {
+    mix-blend-mode: multiply;
+}
+
+/* --- Logo sizing: constrain PNG to match original SVG footprint --- */
+.main-header .header-lower .logo-box .logo img {
+    max-height: 90px;
+    width: auto;
+}
+
+.main-header.fixed-header .header-lower .logo-box .logo img {
+    max-height: 70px;
+    width: auto;
+}
+
+.mobile-menu .nav-logo img {
+    max-height: 80px;
+    width: auto;
+}
+
+.footer-logo img {
+    max-height: 90px;
+    width: auto;
+}
+
+
+/* --- Navbar layout: stretch nav-outer to fill available width --- */
+.header-lower .inner-container .nav-outer {
+    flex: 1;
+}
+
+/* Center the nav links inside nav-outer */
+.nav-outer .main-menu {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* --- Nav links: bigger, bolder, more readable --- */
+.main-header .main-menu .navigation > li > a {
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    color: rgba(var(--color-three-rgb), 0.95) !important;
+    letter-spacing: 0.2px;
+}
+
+/* Keep hover/active colour consistent */
+.main-header .main-menu .navigation > li:hover > a,
+.main-header .main-menu .navigation > li.current > a {
+    color: var(--main-color) !important;
+}
+
+/* --- Navbar: Register Now pill button --- */
+
+/* Push the button to the far right of nav-outer */
+.nav-outer .main-header_button {
+    margin-left: auto;
+    padding-left: 30px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Transparent border by default so layout doesn't shift on hover */
+.nav-register-btn {
+    border: 2px solid transparent !important;
+    transition: border-color 0.4s ease !important;
+}
+
+/* Orange border appears on hover — reveals the pill outline clearly */
+.nav-register-btn:hover {
+    border-color: var(--main-color) !important;
+}
+
+/* Keep the pill border on sticky/fixed header hover too */
+.main-header.fixed-header .nav-register-btn:hover {
+    border-color: var(--main-color) !important;
+}
+
+/* ============================================================
+   Hero Slider — Two side-by-side widget cards below CTAs
+   ============================================================ */
+
+/* Wrapper row for both cards */
+.hero-widgets-row {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+
+/* ---- Countdown card ---- */
+.slider-one_booking {
+    position: relative !important;
+    left: auto !important;
+    bottom: auto !important;
+    display: inline-block;
+    background-color: #fff !important;
+    border-radius: 10px !important;
+    padding: 14px 18px !important;
+    width: auto !important;
+}
+
+.slider-one_booking-title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--color-four) !important;
+    margin-bottom: 10px !important;
+}
+
+/* Countdown digits — re-enforce readability on white card */
+.slider-one .time-countdown .counter-column {
+    color: var(--color-four) !important;
+}
+
+.slider-one .time-countdown .counter-column:before {
+    color: var(--main-color) !important;
+}
+
+/* ---- Available seats card ---- */
+.hero-seats-card {
+    background-color: var(--main-color);
+    border-radius: 10px;
+    padding: 14px 22px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 110px;
+}
+
+.hero-seats-card_title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 6px;
+}
+
+.hero-seats-card_count {
+    font-size: 38px;
+    font-weight: 900;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.hero-seats-card_sub {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.80);
+}
+
+/* ============================================================
+   Hero Slider — Text readability
+   ============================================================ */
+
+/* Badge label above heading */
+.slider-one_title {
+    font-size: 15px !important;
+    letter-spacing: 1px !important;
+    opacity: 1 !important;
+}
+
+/* Main hero heading */
+.slider-one_heading {
+    font-size: 46px !important;
+    line-height: 1.18 !important;
+    font-weight: 800 !important;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+
+/* Sub-text paragraph */
+.slider-one_text {
+    font-size: 19px !important;
+    line-height: 32px !important;
+    opacity: 0.92 !important;
+    font-weight: 400 !important;
+}
