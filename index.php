@@ -894,7 +894,7 @@ include('includes/navbar.php');
 							<li>
 								<i class="icon flaticon-arroba"></i>
 								Email Us<br>
-								<a href="mailto:hello@traceworka.ng">hello@traceworka.ng</a>
+								<a href="mailto:summercamp@traceworka.ng">summercamp@traceworka.ng</a>
 							</li>
 							<li>
 								<i class="icon flaticon-maps-and-flags"></i>

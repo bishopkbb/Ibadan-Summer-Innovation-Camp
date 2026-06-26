@@ -93,7 +93,7 @@ $mail_body = '<!DOCTYPE html>
   </td></tr>
 </table>
 </body></html>';
-sendMail('hello@traceworka.ng', 'ISC Admin', $mail_subject, $mail_body, $email);
+sendMail('summercamp@traceworka.ng', 'ISC Admin', $mail_subject, $mail_body, $email);
 
 redirect('contact.php', 'contact_success',
     "Thank you, {$name}! Your message has been sent. We'll get back to you within 24 hours."

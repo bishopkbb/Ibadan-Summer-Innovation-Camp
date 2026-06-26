@@ -3,11 +3,11 @@
 --  Run this once in phpMyAdmin → SQL tab
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS `ibadan_camp`
+CREATE DATABASE IF NOT EXISTS `traceworka_summercamp`
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE `ibadan_camp`;
+USE `traceworka_summercamp`;
 
 -- ============================================================
 --  Table: registrations

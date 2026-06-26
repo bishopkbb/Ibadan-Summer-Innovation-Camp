@@ -54,7 +54,7 @@
     "@type": "Organization",
     "name": "Traceworka Innovative Solutions Limited",
     "url": "https://traceworka.ng",
-    "email": "hello@traceworka.ng",
+    "email": "summercamp@traceworka.ng",
     "telephone": "+2349071543344"
   },
   "offers": [

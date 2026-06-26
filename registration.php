@@ -550,7 +550,7 @@ function updatePackagePrices(n) {
 		} else {
 			priceEl.innerHTML = '<span style="font-size:18px;font-weight:700;">Group Rate</span>';
 			descEl.innerHTML  = naira(base) + '/child &nbsp;&middot;&nbsp; Final price via contact<br>' +
-				'<a href="mailto:hello@traceworka.ng" style="font-size:12px;color:#f4821f;font-weight:600;">hello@traceworka.ng</a>';
+				'<a href="mailto:summercamp@traceworka.ng" style="font-size:12px;color:#f4821f;font-weight:600;">summercamp@traceworka.ng</a>';
 		}
 	});
 
@@ -720,7 +720,7 @@ function setChildCount(n) {
 			var msgs = {
 				2: '<i class="fa-solid fa-tags" style="color:#f4821f;font-size:16px;flex-shrink:0;"></i><span><strong>Family Discount applies!</strong> Get 10% off your second child\'s registration fee.</span>',
 				3: '<i class="fa-solid fa-tags" style="color:#f4821f;font-size:16px;flex-shrink:0;"></i><span><strong>Family Discount applies!</strong> 10% off 2nd child &amp; 15% off 3rd child.</span>',
-				4: '<i class="fa-solid fa-tags" style="color:#f4821f;font-size:16px;flex-shrink:0;"></i><span><strong>Group Discount available!</strong> Contact us at <strong>hello@traceworka.ng</strong> for special group rates.</span>'
+				4: '<i class="fa-solid fa-tags" style="color:#f4821f;font-size:16px;flex-shrink:0;"></i><span><strong>Group Discount available!</strong> Contact us at <strong>summercamp@traceworka.ng</strong> for special group rates.</span>'
 			};
 			hint.innerHTML = msgs[n] || msgs[4];
 		}

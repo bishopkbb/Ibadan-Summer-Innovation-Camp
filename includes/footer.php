@@ -101,7 +101,7 @@
 								<div class="footer-widget links-widget">
 									<h5 class="footer-title">Contact</h5>
 									<ul class="footer-list">
-										<li><i class="fa-solid fa-envelope fa-fw" style="color:var(--main-color);margin-right:6px;"></i><a href="mailto:hello@traceworka.ng">hello@traceworka.ng</a></li>
+										<li><i class="fa-solid fa-envelope fa-fw" style="color:var(--main-color);margin-right:6px;"></i><a href="mailto:summercamp@traceworka.ng">summercamp@traceworka.ng</a></li>
 										<li><i class="fa-solid fa-phone fa-fw" style="color:var(--main-color);margin-right:6px;"></i><a href="tel:+2349071543344">+234 907 154 3344</a></li>
 										<li><i class="fa-solid fa-phone fa-fw" style="color:var(--main-color);margin-right:6px;"></i><a href="tel:+2348135235891">+234 813 523 5891</a></li>
 										<li style="margin-top:8px;"><i class="fa-solid fa-location-dot fa-fw" style="color:var(--main-color);margin-right:6px;vertical-align:top;margin-top:3px;"></i><a href="contact.php">No 6, Hon Tunde Sarumi Close, Off Adenuga Street, Kongi-Bodija, Ibadan</a></li>

@@ -1,0 +1,56 @@
+# ============================================================
+#  Ibadan Summer Innovation Camp 2026 — .gitignore
+# ============================================================
+
+# ── Sensitive config files (contain real passwords & credentials) ──
+config/db.php
+config/app.php
+config/admin_hash.php
+
+# ── Composer / PHP dependencies ──
+vendor/
+composer.phar
+
+# ── Internal documents ──
+ISC2026_Setup_Guide.docx
+
+# ── PHP logs & error files ──
+*.log
+error_log
+php_errors.log
+
+# ── OS generated files ──
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── IDE & editor files ──
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+nbproject/
+
+# ── Temporary & backup files ──
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# ── Database dumps (backups you export from phpMyAdmin) ──
+*.sql.gz
+*.sql.zip
+database/backup_*.sql
+
+# ── Environment files ──
+.env
+.env.local
+.env.production

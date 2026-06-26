@@ -15,4 +15,4 @@ define('ADMIN_PASS_HASH', '');          // ← paste your generated hash here
 
 define('ADMIN_SESSION_KEY', 'isc_admin_auth_2026');
 define('ADMIN_TITLE',       'ISC 2026 — Admin Panel');
-define('CAMP_EMAIL',        'hello@traceworka.ng');
+define('CAMP_EMAIL',        'summercamp@traceworka.ng');

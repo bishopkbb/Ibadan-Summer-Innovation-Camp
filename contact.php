@@ -78,7 +78,7 @@ include('includes/navbar.php');
 					<div class="info-block_two-inner">
 						<div class="info-block_two-icon"><i class="flaticon-mail"></i></div>
 						<h4>Email Address</h4>
-						<a href="mailto:hello@traceworka.ng">hello@traceworka.ng</a>
+						<a href="mailto:summercamp@traceworka.ng">summercamp@traceworka.ng</a>
 					</div>
 				</div>
 
@@ -192,7 +192,7 @@ include('includes/navbar.php');
 								</li>
 								<li style="display:flex;align-items:center;gap:10px;">
 									<i class="fa-solid fa-envelope" style="color:var(--main-color);font-size:14px;flex-shrink:0;"></i>
-									<a href="mailto:hello@traceworka.ng" style="font-size:14px;color:#444;text-decoration:none;font-weight:500;">hello@traceworka.ng</a>
+									<a href="mailto:summercamp@traceworka.ng" style="font-size:14px;color:#444;text-decoration:none;font-weight:500;">summercamp@traceworka.ng</a>
 								</li>
 							</ul>
 							<div style="border-top:1px solid #e2e5ed;padding-top:18px;">

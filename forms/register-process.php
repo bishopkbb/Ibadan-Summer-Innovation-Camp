@@ -268,7 +268,7 @@ foreach ($children as $child) {
         error_log('Execute failed: ' . $stmt->error);
         $stmt->close();
         $conn->close();
-        redirect('registration.php', 'reg_error', 'Registration could not be saved. Please try again or contact us at hello@traceworka.ng.');
+        redirect('registration.php', 'reg_error', 'Registration could not be saved. Please try again or contact us at summercamp@traceworka.ng.');
     }
 }
 
@@ -464,7 +464,7 @@ $body = '<!DOCTYPE html>
         <td style="padding:0 36px 36px;">
           <p style="margin:0 0 14px;color:#444;font-size:15px;line-height:1.7;">
             If you have any questions or require assistance, please feel free to contact us at
-            <a href="mailto:hello@traceworka.ng" style="color:#f4821f;text-decoration:none;font-weight:600;">hello@traceworka.ng</a>
+            <a href="mailto:summercamp@traceworka.ng" style="color:#f4821f;text-decoration:none;font-weight:600;">summercamp@traceworka.ng</a>
             or call <a href="tel:+2349071543344" style="color:#f4821f;text-decoration:none;font-weight:600;">+234 907 154 3344</a>.
           </p>
           <p style="margin:0 0 24px;color:#444;font-size:15px;line-height:1.7;">
@@ -496,7 +496,7 @@ $body = '<!DOCTYPE html>
 sendMail($email, $parent_name, $subject, $body);
 
 /* ===================================================
-   Admin notification email (HTML) → hello@traceworka.ng
+   Admin notification email (HTML) → summercamp@traceworka.ng
    =================================================== */
 $admin_subject = '[ISC2026] New Registration — ' . $child_names . ' (' . $package . ')';
 
@@ -610,7 +610,7 @@ $admin_body = '<!DOCTYPE html>
 </body>
 </html>';
 
-sendMail('hello@traceworka.ng', 'ISC Admin', $admin_subject, $admin_body, $email);
+sendMail('summercamp@traceworka.ng', 'ISC Admin', $admin_subject, $admin_body, $email);
 
 /* ===================================================
    Success redirect
