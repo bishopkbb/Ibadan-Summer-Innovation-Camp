@@ -108,6 +108,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
 <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
+
+<?php
+// Google Analytics 4
+if (!defined('GA_MEASUREMENT_ID') && file_exists(__DIR__ . '/../config/app.php')) {
+    require_once __DIR__ . '/../config/app.php';
+}
+if (!empty(GA_MEASUREMENT_ID ?? '')):
+?>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo htmlspecialchars(GA_MEASUREMENT_ID); ?>"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '<?php echo htmlspecialchars(GA_MEASUREMENT_ID); ?>');
+</script>
+<?php endif; ?>
 </head>
 <body>
 <div class="page-wrapper">

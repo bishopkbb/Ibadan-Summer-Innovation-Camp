@@ -1,7 +1,19 @@
 <?php
 session_start();
+require_once('config/db.php');
+require_once('config/app.php');
+
 $page_title = 'Registration – Ibadan Summer Innovation Camp 2026';
 $meta_description = 'Register for the Ibadan Summer Innovation Camp 2026. Fill in your student and parent details, select a learning track, and choose your package. Ages 7–18.';
+
+// Live seat count from DB
+$seats_remaining = TOTAL_SEATS;
+try {
+    $conn = getDBConnection();
+    $sr = $conn->query("SELECT COUNT(*) AS total FROM registrations WHERE status != 'cancelled'");
+    if ($sr) $seats_remaining = max(0, TOTAL_SEATS - (int)$sr->fetch_assoc()['total']);
+    $conn->close();
+} catch (Exception $e) {}
 
 // Pre-fill package from URL parameter
 $selected_package = '';
@@ -15,7 +27,28 @@ if (!empty($_GET['package'])) {
 $early_bird_deadline = new DateTime('2026-07-20 00:00:00');
 $early_bird_expired  = new DateTime() >= $early_bird_deadline;
 if ($early_bird_expired && $selected_package === 'Early Bird') {
-    $selected_package = ''; // don't pre-select an expired offer from URL
+    $selected_package = '';
+}
+
+// Form repopulation after validation error
+$reg_old = null;
+if (!empty($_SESSION['reg_old'])) {
+    $reg_old = $_SESSION['reg_old'];
+    unset($_SESSION['reg_old']);
+    // Override package from saved data
+    if (!empty($reg_old['package']) && !($early_bird_expired && $reg_old['package'] === 'Early Bird')) {
+        $selected_package = $reg_old['package'];
+    }
+}
+
+function old_val(string $key, string $default = ''): string {
+    global $reg_old;
+    if (!$reg_old || !isset($reg_old[$key]) || $reg_old[$key] === '') return htmlspecialchars($default);
+    return htmlspecialchars((string)$reg_old[$key]);
+}
+function old_sel(string $key, string $val): string {
+    global $reg_old;
+    return (!empty($reg_old[$key]) && $reg_old[$key] === $val) ? 'selected' : '';
 }
 
 // Flash messages from redirect
@@ -73,7 +106,13 @@ include('includes/navbar.php');
 			<div class="inner-container" style="max-width:900px;margin:0 auto;">
 
 				<h3 style="margin-bottom:8px;">Ibadan Summer Innovation Camp 2026</h3>
-				<div class="text" style="margin-bottom:35px;">Complete all sections below. Fields marked <span style="color:#e74c3c;font-weight:700;">*</span> are required. <a href="contact.php">Contact us</a> if you have any questions.</div>
+				<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:35px;">
+					<div class="text" style="margin:0;">Complete all sections below. Fields marked <span style="color:#e74c3c;font-weight:700;">*</span> are required. <a href="contact.php">Contact us</a> if you have any questions.</div>
+					<div style="display:inline-flex;align-items:center;gap:8px;background:<?php echo $seats_remaining <= 10 ? '#fff5f5' : '#f0fff4'; ?>;border:1.5px solid <?php echo $seats_remaining <= 10 ? '#e74c3c' : '#2ecc71'; ?>;border-radius:30px;padding:7px 16px;font-size:13px;font-weight:700;color:<?php echo $seats_remaining <= 10 ? '#c0392b' : '#1a7a4a'; ?>;white-space:nowrap;">
+						<i class="fa-solid fa-chair" style="font-size:12px;"></i>
+						<?php echo $seats_remaining; ?> spot<?php echo $seats_remaining !== 1 ? 's' : ''; ?> remaining
+					</div>
+				</div>
 
 				<?php if ($success_msg): ?>
 				<div style="background:#d4edda;border:1px solid #c3e6cb;color:#155724;padding:20px;border-radius:10px;margin-bottom:25px;font-weight:600;">
@@ -127,38 +166,38 @@ include('includes/navbar.php');
 
 								<div class="col-lg-6 col-md-6 col-sm-12 form-group">
 									<label>Parent / Guardian Full Name <span style="color:#e74c3c;">*</span></label>
-									<input type="text" name="parent_name" maxlength="255" required>
+									<input type="text" name="parent_name" maxlength="255" required value="<?php echo old_val('parent_name'); ?>">
 								</div>
 
 								<div class="col-lg-6 col-md-6 col-sm-12 form-group">
 									<label>Relationship to Student <span style="color:#e74c3c;">*</span></label>
 									<select name="relationship" class="custom-select-box" required>
 										<option value="">Select Relationship</option>
-										<option value="Father">Father</option>
-										<option value="Mother">Mother</option>
-										<option value="Guardian">Guardian</option>
-										<option value="Other">Other</option>
+										<option value="Father" <?php echo old_sel('relationship','Father'); ?>>Father</option>
+										<option value="Mother" <?php echo old_sel('relationship','Mother'); ?>>Mother</option>
+										<option value="Guardian" <?php echo old_sel('relationship','Guardian'); ?>>Guardian</option>
+										<option value="Other" <?php echo old_sel('relationship','Other'); ?>>Other</option>
 									</select>
 								</div>
 
 								<div class="col-lg-6 col-md-6 col-sm-12 form-group">
 									<label>Phone Number <span style="color:#e74c3c;">*</span></label>
-									<input type="tel" name="phone" maxlength="50" placeholder="+234..." required>
+									<input type="tel" name="phone" maxlength="50" placeholder="+234..." required value="<?php echo old_val('phone'); ?>">
 								</div>
 
 								<div class="col-lg-6 col-md-6 col-sm-12 form-group">
 									<label>Alternative Phone Number</label>
-									<input type="tel" name="alt_phone" maxlength="50" placeholder="+234...">
+									<input type="tel" name="alt_phone" maxlength="50" placeholder="+234..." value="<?php echo old_val('alt_phone'); ?>">
 								</div>
 
 								<div class="col-lg-12 col-md-12 col-sm-12 form-group">
 									<label>Email Address <span style="color:#e74c3c;">*</span></label>
-									<input type="email" name="email" maxlength="255" required>
+									<input type="email" name="email" maxlength="255" required value="<?php echo old_val('email'); ?>">
 								</div>
 
 								<div class="col-lg-12 col-md-12 col-sm-12 form-group">
 									<label>Parent / Guardian Residential Address <span style="color:#e74c3c;">*</span></label>
-									<textarea name="parent_address" rows="3" required></textarea>
+									<textarea name="parent_address" rows="3" required><?php echo old_val('parent_address'); ?></textarea>
 								</div>
 
 							</div>
@@ -825,6 +864,85 @@ function highlightPackage(pkg) {
 	document.getElementById('pkg-' + pkg).style.background  = '#fff8f0';
 }
 
+<?php if ($reg_old): ?>
+var REG_OLD = <?php
+    $old_children = [];
+    $fn_arr = (array)($reg_old['first_name'] ?? []);
+    for ($ci = 0; $ci < count($fn_arr); $ci++) {
+        $ga = function(string $k) use ($reg_old, $ci) {
+            $v = $reg_old[$k] ?? [];
+            return is_array($v) ? ($v[$ci] ?? '') : (string)$v;
+        };
+        $old_children[] = [
+            'first_name'             => $ga('first_name'),
+            'last_name'              => $ga('last_name'),
+            'other_name'             => $ga('other_name'),
+            'gender'                 => $ga('gender'),
+            'date_of_birth'          => $ga('date_of_birth'),
+            'age'                    => $ga('age'),
+            'school'                 => $ga('school'),
+            'class_grade'            => $ga('class_grade'),
+            'address'                => $ga('address'),
+            'learning_track'         => $ga('learning_track'),
+            'courses'                => $ga('courses'),
+            'medical_condition'      => $ga('medical_condition'),
+            'allergies'              => $ga('allergies'),
+            'emergency_contact'      => $ga('emergency_contact'),
+            'emergency_phone'        => $ga('emergency_phone'),
+            'emergency_relationship' => $ga('emergency_relationship'),
+        ];
+    }
+    echo json_encode(['num_children' => count($fn_arr), 'children' => $old_children]);
+?>;
+
+function repopulateFromOld(oldData) {
+    if (!oldData || !oldData.children || !oldData.children.length) return;
+    setChildCount(oldData.num_children);
+    setTimeout(function() {
+        oldData.children.forEach(function(c, i) {
+            function sf(name, val) {
+                var el = document.querySelector('[name="' + name + '[' + i + ']"]');
+                if (el && val) el.value = val;
+            }
+            sf('first_name',             c.first_name);
+            sf('last_name',              c.last_name);
+            sf('other_name',             c.other_name);
+            sf('date_of_birth',          c.date_of_birth);
+            sf('school',                 c.school);
+            sf('class_grade',            c.class_grade);
+            sf('address',                c.address);
+            sf('medical_condition',      c.medical_condition);
+            sf('allergies',              c.allergies);
+            sf('emergency_contact',      c.emergency_contact);
+            sf('emergency_phone',        c.emergency_phone);
+            sf('gender',                 c.gender);
+            sf('age',                    c.age);
+            sf('emergency_relationship', c.emergency_relationship);
+
+            if (c.learning_track) {
+                var trackEl = document.getElementById('learning_track_' + i);
+                if (trackEl) {
+                    trackEl.value = c.learning_track;
+                    if (c.age) updateCourses(i);
+                    if (c.courses) {
+                        setTimeout(function(idx, csv) {
+                            var saved = csv.split(',').map(function(s){ return s.trim(); });
+                            var menu  = document.getElementById('courses-menu_' + idx);
+                            if (menu) {
+                                menu.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+                                    if (saved.indexOf(cb.value) !== -1) cb.checked = true;
+                                });
+                                syncCourses(idx);
+                            }
+                        }, 80, i, c.courses);
+                    }
+                }
+            }
+        });
+    }, 60);
+}
+<?php endif; ?>
+
 document.addEventListener('DOMContentLoaded', function() {
 	/* Auto-highlight pre-selected package */
 	var checked = document.querySelector('input[name="package"]:checked');
@@ -841,8 +959,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 
-	/* Render initial single-child form */
+	/* Render initial single-child form — or restore from saved data */
+	<?php if ($reg_old): ?>
+	repopulateFromOld(REG_OLD);
+	<?php else: ?>
 	setChildCount(1);
+	<?php endif; ?>
 
 	/* Pre-submit child validation — runs in capture phase before form-validation.js */
 	document.getElementById('registration-form').addEventListener('submit', function(e) {

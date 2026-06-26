@@ -1,0 +1,14 @@
+{
+    "name": "traceworka/ibadan-summer-camp-2026",
+    "description": "Ibadan Summer Innovation Camp 2026 — Registration & Admin System",
+    "require": {
+        "php": ">=8.0",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "config": {
+        "allow-plugins": {}
+    },
+    "autoload": {
+        "psr-4": {}
+    }
+}

@@ -6,10 +6,10 @@ Options -Indexes
 # ── Custom error pages ────────────────────────────────────────
 ErrorDocument 404 /404.php
 
-# ── HTTPS redirect (uncomment once SSL is active on cPanel) ──
-# RewriteEngine On
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# ── HTTPS redirect (active — requires SSL certificate in cPanel) ──
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # ── Protect dot-files and sensitive root files ────────────────
 <FilesMatch "^(\.htaccess|\.htpasswd|\.env|composer\.lock|\.git)">

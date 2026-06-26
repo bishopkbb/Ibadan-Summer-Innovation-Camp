@@ -6,7 +6,7 @@ $total_seats = 103;
 $seats_remaining = $total_seats;
 try {
     $conn = getDBConnection();
-    $seats_result = $conn->query("SELECT COUNT(*) AS total FROM registrations");
+    $seats_result = $conn->query("SELECT COUNT(*) AS total FROM registrations WHERE status != 'cancelled'");
     if ($seats_result) {
         $seats_row = $seats_result->fetch_assoc();
         $seats_remaining = max(0, $total_seats - (int)$seats_row['total']);

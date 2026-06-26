@@ -447,6 +447,7 @@ tbody tr:hover td { background: #fafbff; }
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Submitted</th>
+                        <th></th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -494,6 +495,9 @@ tbody tr:hover td { background: #fafbff; }
                                 <?php endforeach; ?>
                             </select>
                         </form>
+                    </td>
+                    <td class="nowrap">
+                        <a href="view.php?id=<?php echo $r['id']; ?>" style="display:inline-block;background:#002D45;color:#fff;text-decoration:none;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;">View →</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

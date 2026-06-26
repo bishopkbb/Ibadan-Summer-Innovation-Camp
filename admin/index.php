@@ -1,4 +1,12 @@
 <?php
+// Secure session cookie before starting the session
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path'     => '/',
+    'secure'   => true,
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
 session_start();
 require_once('config.php');
 

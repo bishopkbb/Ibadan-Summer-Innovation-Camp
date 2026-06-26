@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once('../config/db.php');
+require_once('../config/mailer.php');
 
 /* ===================================================
    Helpers
@@ -170,6 +171,7 @@ if (empty($_POST['consent_payment']))     $errors[] = 'You must acknowledge the 
    Return errors
    =================================================== */
 if (!empty($errors)) {
+    $_SESSION['reg_old'] = $_POST;
     redirect('registration.php', 'reg_error', implode(' | ', $errors));
 }
 
@@ -218,6 +220,7 @@ function fmt_naira(int $amount): string {
    Insert one row per child
    =================================================== */
 $conn = getDBConnection();
+$conn->begin_transaction();
 
 $stmt = $conn->prepare("
     INSERT INTO registrations (
@@ -261,6 +264,7 @@ foreach ($children as $child) {
     );
 
     if (!$stmt->execute()) {
+        $conn->rollback();
         error_log('Execute failed: ' . $stmt->error);
         $stmt->close();
         $conn->close();
@@ -268,6 +272,7 @@ foreach ($children as $child) {
     }
 }
 
+$conn->commit();
 $stmt->close();
 $conn->close();
 
@@ -488,46 +493,124 @@ $body = '<!DOCTYPE html>
 </body>
 </html>';
 
-$headers  = "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-$headers .= "From: Ibadan Summer Innovation Camp <hello@traceworka.ng>\r\n";
-$headers .= "Reply-To: hello@traceworka.ng\r\n";
-$headers .= "X-Mailer: PHP/" . phpversion();
-@mail($email, $subject, $body, $headers);
+sendMail($email, $parent_name, $subject, $body);
 
 /* ===================================================
-   Admin notification email → hello@traceworka.ng
+   Admin notification email (HTML) → hello@traceworka.ng
    =================================================== */
-$admin_subject = "[ISC2026] New Registration – {$child_names} – {$package}";
-$admin_body    = "NEW CAMP REGISTRATION\n" . str_repeat('=', 52) . "\n\n";
-$admin_body   .= "Package:    {$package}\n";
-$admin_body   .= "Children:   {$num_children}\n";
-$admin_body   .= "Submitted:  " . date('d M Y, H:i') . "\n\n";
-$admin_body   .= "PARENT / GUARDIAN\n" . str_repeat('-', 30) . "\n";
-$admin_body   .= "Name:         {$parent_name}\n";
-$admin_body   .= "Relationship: {$relationship}\n";
-$admin_body   .= "Phone:        {$phone}\n";
-$admin_body   .= "Alt Phone:    " . ($alt_phone ?: '—') . "\n";
-$admin_body   .= "Email:        {$email}\n";
-$admin_body   .= "Address:      {$parent_address}\n\n";
+$admin_subject = '[ISC2026] New Registration — ' . $child_names . ' (' . $package . ')';
 
+$admin_children_html = '';
 foreach ($children as $idx => $c) {
-    $lbl = $num_children === 1 ? 'STUDENT' : 'CHILD ' . ($idx + 1);
-    $admin_body .= "{$lbl}\n" . str_repeat('-', 30) . "\n";
-    $admin_body .= "Name:           {$c['fn']} {$c['ln']}" . ($c['on'] ? " {$c['on']}" : '') . "\n";
-    $admin_body .= "Gender:         {$c['gender']}\n";
-    $admin_body .= "DOB / Age:      {$c['dob']} ({$c['age']} yrs)\n";
-    $admin_body .= "School:         {$c['school']}\n";
-    $admin_body .= "Class/Grade:    {$c['grade']}\n";
-    $admin_body .= "Track:          {$c['track']}\n";
-    $admin_body .= "Courses:        {$c['courses_str']}\n";
-    $admin_body .= "Medical:        " . ($c['med_cond'] ?: 'None') . "\n";
-    $admin_body .= "Allergies:      " . ($c['allergies'] ?: 'None') . "\n";
-    $admin_body .= "Emerg. Contact: {$c['em_name']} — {$c['em_phone']}\n\n";
+    $lbl = $num_children === 1 ? 'Student' : 'Child ' . ($idx + 1);
+    $admin_children_html .= '
+      <tr><td colspan="2" style="padding:14px 20px 4px;background:#f8f9ff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#f4821f;border-top:2px solid #f0f2f7;">'
+        . htmlspecialchars($lbl) . ': ' . htmlspecialchars($c['fn'] . ' ' . $c['ln'] . ($c['on'] ? ' ' . $c['on'] : '')) .
+      '</td></tr>
+      <tr>
+        <td style="padding:7px 20px;font-size:13px;color:#888;width:140px;border-bottom:1px solid #f4f5f8;">Gender / Age</td>
+        <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;">' . htmlspecialchars($c['gender']) . ' · ' . $c['age'] . ' yrs (DOB: ' . htmlspecialchars($c['dob']) . ')</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">School / Grade</td>
+        <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;">' . htmlspecialchars($c['school']) . ' · ' . htmlspecialchars($c['grade']) . '</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Track / Courses</td>
+        <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;"><strong>' . htmlspecialchars($c['track']) . '</strong><br><span style="color:#666;font-size:13px;">' . htmlspecialchars($c['courses_str']) . '</span></td>
+      </tr>
+      <tr>
+        <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Medical / Allergies</td>
+        <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;">' . htmlspecialchars($c['med_cond'] ?: 'None') . ' / ' . htmlspecialchars($c['allergies'] ?: 'None') . '</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Emergency Contact</td>
+        <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;">' . htmlspecialchars($c['em_name']) . ' (' . htmlspecialchars($c['em_rel'] ?: '—') . ') · ' . htmlspecialchars($c['em_phone']) . '</td>
+      </tr>';
 }
 
-$admin_headers = "From: hello@traceworka.ng\r\nReply-To: {$email}\r\nX-Mailer: PHP/" . phpversion();
-@mail('hello@traceworka.ng', $admin_subject, $admin_body, $admin_headers);
+$admin_amount_html = $is_group_rate
+    ? '<td style="padding:7px 20px;font-size:14px;color:#b7600a;border-bottom:1px solid #f4f5f8;">Group rate — confirm manually</td>'
+    : '<td style="padding:7px 20px;font-size:14px;color:#1a1a2e;font-weight:800;border-bottom:1px solid #f4f5f8;">&#8358;' . number_format($total_amount) . '</td>';
+
+$admin_body = '<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:30px 0;">
+  <tr><td align="center">
+    <table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+
+      <tr>
+        <td style="background:#002D45;padding:28px 36px;">
+          <p style="margin:0 0 4px;color:#f4821f;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Admin Notification</p>
+          <h1 style="margin:0;color:#fff;font-size:20px;font-weight:800;">New Registration Received</h1>
+          <p style="margin:8px 0 0;color:rgba(255,255,255,0.65);font-size:13px;">Ibadan Summer Innovation Camp 2026 &nbsp;·&nbsp; ' . date('d M Y, H:i') . '</p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#f4821f;padding:12px 36px;">
+          <table cellpadding="0" cellspacing="0" width="100%"><tr>
+            <td style="color:#fff;font-size:13px;font-weight:700;">Package: <span style="font-size:15px;">' . htmlspecialchars($package) . '</span></td>
+            <td style="color:#fff;font-size:13px;font-weight:700;text-align:center;">' . $num_children . ' ' . ($num_children === 1 ? 'Child' : 'Children') . '</td>
+            <td style="color:#fff;font-size:13px;font-weight:700;text-align:right;">Amount: <span style="font-size:15px;">' . ($is_group_rate ? 'Group rate' : '&#8358;' . number_format($total_amount)) . '</span></td>
+          </tr></table>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:28px 36px 0;">
+          <p style="margin:0 0 10px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#002D45;">Parent / Guardian</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8eaf0;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td style="padding:7px 20px;font-size:13px;color:#888;width:140px;border-bottom:1px solid #f4f5f8;">Name</td>
+              <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;font-weight:700;border-bottom:1px solid #f4f5f8;">' . htmlspecialchars($parent_name) . ' (' . htmlspecialchars($relationship) . ')</td>
+            </tr>
+            <tr>
+              <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Phone</td>
+              <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;">' . htmlspecialchars($phone) . ($alt_phone ? ' / ' . htmlspecialchars($alt_phone) : '') . '</td>
+            </tr>
+            <tr>
+              <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Email</td>
+              <td style="padding:7px 20px;font-size:14px;border-bottom:1px solid #f4f5f8;"><a href="mailto:' . htmlspecialchars($email) . '" style="color:#f4821f;">' . htmlspecialchars($email) . '</a></td>
+            </tr>
+            <tr>
+              <td style="padding:7px 20px;font-size:13px;color:#888;">Address</td>
+              <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;">' . htmlspecialchars($parent_address) . '</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:20px 36px 0;">
+          <p style="margin:0 0 10px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#002D45;">' . ($num_children === 1 ? 'Student' : 'Children') . ' Details</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8eaf0;border-radius:8px;overflow:hidden;">
+            ' . $admin_children_html . '
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:28px 36px;text-align:center;">
+          <a href="' . SITE_URL . '/admin/dashboard.php" style="display:inline-block;background:#002D45;color:#fff;text-decoration:none;padding:13px 28px;border-radius:8px;font-size:14px;font-weight:700;">View in Admin Dashboard →</a>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#002D45;padding:18px 36px;text-align:center;">
+          <p style="margin:0;color:rgba(255,255,255,0.5);font-size:11px;">ISC 2026 Admin Notification · Traceworka Innovative Solutions Limited</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>';
+
+sendMail('hello@traceworka.ng', 'ISC Admin', $admin_subject, $admin_body, $email);
 
 /* ===================================================
    Success redirect
