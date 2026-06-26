@@ -39,14 +39,16 @@ CREATE TABLE IF NOT EXISTS `registrations` (
     `courses`            TEXT           NOT NULL,
 
     -- Medical
-    `medical_condition`  TEXT           DEFAULT NULL,
-    `allergies`          TEXT           DEFAULT NULL,
-    `emergency_contact`  VARCHAR(255)   NOT NULL,
-    `emergency_phone`    VARCHAR(50)    NOT NULL,
+    `medical_condition`      TEXT           DEFAULT NULL,
+    `allergies`              TEXT           DEFAULT NULL,
+    `emergency_contact`      VARCHAR(255)   NOT NULL,
+    `emergency_phone`        VARCHAR(50)    NOT NULL,
+    `emergency_relationship` VARCHAR(100)   DEFAULT NULL,
 
-    -- Package
+    -- Package & Payment
     `package`            VARCHAR(50)    NOT NULL,
     `number_of_children` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    `amount_to_pay`      INT UNSIGNED   DEFAULT NULL,
 
     -- Admin
     `status`             ENUM('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
@@ -60,6 +62,14 @@ CREATE TABLE IF NOT EXISTS `registrations` (
     INDEX `idx_track`   (`learning_track`),
     INDEX `idx_created` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+--  Migration: run these ALTER statements if you already
+--  created the table without the two new columns
+-- ============================================================
+-- ALTER TABLE `registrations`
+--     ADD COLUMN `emergency_relationship` VARCHAR(100) DEFAULT NULL AFTER `emergency_phone`,
+--     ADD COLUMN `amount_to_pay` INT UNSIGNED DEFAULT NULL AFTER `number_of_children`;
 
 -- ============================================================
 --  Table: contact_messages

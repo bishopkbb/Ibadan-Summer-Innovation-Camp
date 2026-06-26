@@ -22,6 +22,10 @@ if (empty($_POST['csrf_token']) || empty($_SESSION['csrf_token']) ||
 }
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
+if (!empty($_POST['website'])) {
+    redirect('contact.php', 'contact_error', 'Submission blocked.');
+}
+
 $name    = sanitize($_POST['name'] ?? '');
 $email   = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
 $phone   = sanitize($_POST['phone'] ?? '');

@@ -57,8 +57,8 @@ fputcsv($out, [
     'School', 'Class/Grade', 'Student Address',
     'Parent/Guardian', 'Relationship', 'Phone', 'Alt Phone', 'Email', 'Parent Address',
     'Learning Track', 'Courses',
-    'Medical Condition', 'Allergies', 'Emergency Contact', 'Emergency Phone',
-    'Package', 'No. of Children', 'Status', 'Date Registered',
+    'Medical Condition', 'Allergies', 'Emergency Contact', 'Emergency Phone', 'Emergency Relationship',
+    'Package', 'No. of Children', 'Amount Due (NGN)', 'Status', 'Date Registered',
 ]);
 
 while ($row = $result->fetch_assoc()) {
@@ -85,8 +85,10 @@ while ($row = $result->fetch_assoc()) {
         $row['allergies'] ?? '',
         $row['emergency_contact'],
         $row['emergency_phone'],
+        $row['emergency_relationship'] ?? '',
         $row['package'],
         $row['number_of_children'],
+        $row['amount_to_pay'] ? (int)$row['amount_to_pay'] : 'Group rate',
         $row['status'],
         $row['created_at'],
     ]);

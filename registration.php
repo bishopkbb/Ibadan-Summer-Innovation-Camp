@@ -92,6 +92,7 @@ include('includes/navbar.php');
 				<div class="register-form">
 					<form method="post" action="forms/register-process.php" id="registration-form" novalidate>
 						<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+						<input type="text" name="website" tabindex="-1" autocomplete="off" style="display:none!important;position:absolute;left:-9999px;" aria-hidden="true" value="">
 						<input type="hidden" name="form_type" value="full_registration">
 						<input type="hidden" name="number_of_children" id="number_of_children" value="1">
 

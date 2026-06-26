@@ -27,6 +27,11 @@ if (empty($_POST['csrf_token']) || empty($_SESSION['csrf_token']) ||
     redirect('registration.php', 'reg_error', 'Security token mismatch. Please refresh and try again.');
 }
 
+// Honeypot: bots fill hidden fields, humans don't
+if (!empty($_POST['website'])) {
+    redirect('registration.php', 'reg_error', 'Submission blocked.');
+}
+
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 /* ===================================================
@@ -88,8 +93,9 @@ for ($i = 0; $i < $num_children; $i++) {
     $craw     = sanitize(postArr('courses',       $i));
     $med_cond = sanitize(postArr('medical_condition', $i));
     $allergies= sanitize(postArr('allergies',     $i));
-    $em_name  = sanitize(postArr('emergency_contact', $i));
-    $em_phone = sanitize(postArr('emergency_phone',   $i));
+    $em_name  = sanitize(postArr('emergency_contact',      $i));
+    $em_phone = sanitize(postArr('emergency_phone',        $i));
+    $em_rel   = sanitize(postArr('emergency_relationship', $i));
 
     /* student validation */
     if (strlen($fn) < 2) $errors[] = "$lbl: First name is required.";
@@ -137,7 +143,7 @@ for ($i = 0; $i < $num_children; $i++) {
         $errors[] = "$lbl: Please enter a valid emergency contact phone.";
     }
 
-    $children[] = compact('fn','ln','on','gender','dob','age','school','grade','addr','track','courses_str','med_cond','allergies','em_name','em_phone');
+    $children[] = compact('fn','ln','on','gender','dob','age','school','grade','addr','track','courses_str','med_cond','allergies','em_name','em_phone','em_rel');
 }
 
 /* ===================================================
@@ -220,8 +226,8 @@ $stmt = $conn->prepare("
         parent_name, relationship, phone, alt_phone, email, parent_address,
         learning_track, courses,
         medical_condition, allergies,
-        emergency_contact, emergency_phone,
-        package, number_of_children,
+        emergency_contact, emergency_phone, emergency_relationship,
+        package, number_of_children, amount_to_pay,
         created_at
     ) VALUES (
         ?, ?, ?, ?, ?, ?,
@@ -229,8 +235,8 @@ $stmt = $conn->prepare("
         ?, ?, ?, ?, ?, ?,
         ?, ?,
         ?, ?,
-        ?, ?,
-        ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
         NOW()
     )
 ");
@@ -240,16 +246,18 @@ if (!$stmt) {
     redirect('registration.php', 'reg_error', 'A server error occurred. Please try again or contact us directly.');
 }
 
+$db_amount = $is_group_rate ? null : $total_amount;
+
 foreach ($children as $child) {
     $stmt->bind_param(
-        'sssssississsssssssssssi',
+        'sssssisssssssssssssssssii',
         $child['fn'], $child['ln'], $child['on'], $child['gender'], $child['dob'], $child['age'],
         $child['school'], $child['grade'], $child['addr'],
         $parent_name, $relationship, $phone, $alt_phone, $email, $parent_address,
         $child['track'], $child['courses_str'],
         $child['med_cond'], $child['allergies'],
-        $child['em_name'], $child['em_phone'],
-        $package, $num_children
+        $child['em_name'], $child['em_phone'], $child['em_rel'],
+        $package, $num_children, $db_amount
     );
 
     if (!$stmt->execute()) {
@@ -419,7 +427,9 @@ $body = '<!DOCTYPE html>
                 <p style="margin:0 0 10px;color:#444;font-size:15px;line-height:1.7;">
                   Please send the payment receipt or screenshot as evidence of payment via <strong>WhatsApp</strong> to:
                 </p>
-                <p style="margin:0 0 12px;text-align:center;font-size:26px;font-weight:900;color:#1a1a2e;letter-spacing:2px;">09071543344</p>
+                <p style="margin:0 0 12px;text-align:center;">
+                  <a href="https://wa.me/2349071543344" style="font-size:26px;font-weight:900;color:#1a1a2e;letter-spacing:2px;text-decoration:none;">09071543344</a>
+                </p>
                 <p style="margin:0;color:#555;font-size:14px;line-height:1.65;">
                   Please ensure that <strong>' . ($num_children > 1 ? 'the children\'s names are' : 'the child\'s name is') . '</strong> included when sending the payment confirmation to help us verify your registration promptly.
                 </p>
@@ -522,8 +532,10 @@ $admin_headers = "From: hello@traceworka.ng\r\nReply-To: {$email}\r\nX-Mailer: P
 /* ===================================================
    Success redirect
    =================================================== */
-$success_text = $num_children === 1
-    ? "Registration submitted! Thank you, {$parent_name}. A confirmation email with payment details has been sent to {$email}. Please complete payment to secure {$children[0]['fn']}'s place."
-    : "Registration submitted! Thank you, {$parent_name}. A confirmation email with payment details has been sent to {$email}. Please complete payment to secure all {$num_children} places.";
+$_SESSION['reg_success_name']     = $parent_name;
+$_SESSION['reg_success_email']    = $email;
+$_SESSION['reg_success_children'] = $num_children;
+$_SESSION['reg_success_child1']   = $children[0]['fn'];
 
-redirect('registration.php', 'reg_success', $success_text);
+header('Location: ../thank-you.php');
+exit;

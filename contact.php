@@ -123,6 +123,7 @@ include('includes/navbar.php');
 						<div class="default-form contact-form">
 							<form method="post" action="forms/contact-process.php" id="contact-form" novalidate>
 								<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+								<input type="text" name="website" tabindex="-1" autocomplete="off" style="display:none!important;position:absolute;left:-9999px;" aria-hidden="true" value="">
 								<div class="row clearfix">
 									<div class="form-group col-lg-6 col-md-6 col-sm-6">
 										<input type="text" name="name" placeholder="Your Full Name *" maxlength="255" required>

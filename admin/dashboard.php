@@ -442,6 +442,7 @@ tbody tr:hover td { background: #fafbff; }
                         <th>Age</th>
                         <th>Track</th>
                         <th>Package</th>
+                        <th>Amount Due</th>
                         <th>Parent</th>
                         <th>Phone</th>
                         <th>Email</th>
@@ -468,6 +469,13 @@ tbody tr:hover td { background: #fafbff; }
                         $pc = $pkgColors[$r['package']] ?? '#555';
                         ?>
                         <span style="color:<?php echo $pc; ?>;font-weight:700;"><?php echo htmlspecialchars($r['package']); ?></span>
+                    </td>
+                    <td class="nowrap">
+                        <?php if (!empty($r['amount_to_pay'])): ?>
+                        <strong style="color:#002D45;">&#8358;<?php echo number_format((int)$r['amount_to_pay']); ?></strong>
+                        <?php else: ?>
+                        <span style="color:#999;font-size:12px;">Group rate</span>
+                        <?php endif; ?>
                     </td>
                     <td class="nowrap"><?php echo htmlspecialchars($r['parent_name']); ?></td>
                     <td class="nowrap"><a href="tel:<?php echo htmlspecialchars($r['phone']); ?>" style="color:#f4821f;text-decoration:none;"><?php echo htmlspecialchars($r['phone']); ?></a></td>

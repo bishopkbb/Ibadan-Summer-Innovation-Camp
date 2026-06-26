@@ -1,0 +1,4 @@
+# Prevent direct browser access to form processors.
+# Forms are only reachable via POST from the site pages.
+Order Allow,Deny
+Deny from all

@@ -1,4 +1,9 @@
 <?php
+// Suppress error output on production — errors go to server log only
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');        // Change to your cPanel DB username
 define('DB_PASS', '');            // Change to your cPanel DB password

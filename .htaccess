@@ -1,0 +1,32 @@
+# Ibadan Summer Innovation Camp 2026
+
+# ── Disable directory listing ─────────────────────────────────
+Options -Indexes
+
+# ── Custom error pages ────────────────────────────────────────
+ErrorDocument 404 /404.php
+
+# ── HTTPS redirect (uncomment once SSL is active on cPanel) ──
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── Protect dot-files and sensitive root files ────────────────
+<FilesMatch "^(\.htaccess|\.htpasswd|\.env|composer\.lock|\.git)">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# ── PHP security headers ──────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── Protect setup file (delete from server after first use) ──
+<Files "setup-hash.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
