@@ -223,25 +223,182 @@ $stmt->close();
 $conn->close();
 
 /* ===================================================
-   Confirmation email
+   Confirmation email — HTML
    =================================================== */
 $child_names = implode(' & ', array_map(fn($c) => $c['fn'] . ' ' . $c['ln'], $children));
-$child_list  = implode("\n", array_map(
-    fn($c, $idx) => '  ' . ($idx + 1) . '. ' . $c['fn'] . ' ' . $c['ln'] . ' — ' . $c['track'],
-    $children, array_keys($children)
-));
+
+/* Build the registered children summary rows */
+$child_rows_html = '';
+foreach ($children as $idx => $c) {
+    $label = $num_children > 1 ? ($idx + 1) . '. ' : '';
+    $child_rows_html .= '
+        <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#1a1a2e;font-size:15px;">
+                ' . htmlspecialchars($label . $c['fn'] . ' ' . $c['ln']) . '
+            </td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#555;font-size:15px;">
+                ' . htmlspecialchars($c['track']) . '
+            </td>
+        </tr>';
+}
 
 $subject = 'Registration Received – Ibadan Summer Innovation Camp 2026';
-$body    = "Dear {$parent_name},\n\n";
-$body   .= "Thank you for registering " . ($num_children > 1 ? "your children" : "{$children[0]['fn']} {$children[0]['ln']}") . " for the Ibadan Summer Innovation Camp 2026.\n\n";
-$body   .= "Children Registered:\n{$child_list}\n";
-$body   .= "Package: {$package}\n\n";
-$body   .= "Our team will contact you within 24 hours with payment details to confirm " . ($num_children > 1 ? "their places" : "your child's place") . ".\n\n";
-$body   .= "Camp Dates: August 3–27, 2026 | Monday–Thursday | 9:00 AM – 3:00 PM\n";
-$body   .= "Venue: Traceworka Innovative Solutions Limited, Kongi-Bodija, Ibadan\n\n";
-$body   .= "For enquiries: hello@traceworka.ng | +234 907 154 3344\n\n";
-$body   .= "See you at camp!\n-- Ibadan Summer Innovation Camp Team";
-$headers = "From: hello@traceworka.ng\r\nReply-To: hello@traceworka.ng\r\nX-Mailer: PHP/" . phpversion();
+
+$body = '<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:30px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+
+      <!-- Header -->
+      <tr>
+        <td style="background:#002D45;padding:32px 36px;text-align:center;">
+          <p style="margin:0 0 6px;color:#f4821f;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Ibadan Summer Innovation Camp</p>
+          <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:800;line-height:1.3;">Registration Received!</h1>
+          <p style="margin:10px 0 0;color:rgba(255,255,255,0.75);font-size:14px;">August 3 – 27, 2026 &nbsp;|&nbsp; Ibadan, Oyo State</p>
+        </td>
+      </tr>
+
+      <!-- Body -->
+      <tr>
+        <td style="padding:36px 36px 10px;">
+          <p style="margin:0 0 18px;color:#1a1a2e;font-size:16px;line-height:1.65;">Dear <strong>' . htmlspecialchars($parent_name) . '</strong>,</p>
+          <p style="margin:0 0 18px;color:#444;font-size:15px;line-height:1.7;">
+            Thank you for registering your child' . ($num_children > 1 ? 'ren' : '') . ' for the <strong>Ibadan Summer Innovation Camp 2026!</strong>
+          </p>
+          <p style="margin:0 0 24px;color:#444;font-size:15px;line-height:1.7;">
+            We are excited to welcome ' . ($num_children > 1 ? 'them' : 'your child') . ' to an enriching and fun-filled learning experience focused on innovation, technology, creativity, entrepreneurship, and personal development.
+          </p>
+
+          <!-- Registered Children -->
+          <p style="margin:0 0 10px;color:#1a1a2e;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">
+            ' . ($num_children > 1 ? 'Children Registered' : 'Child Registered') . '
+          </p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8eaf0;border-radius:8px;overflow:hidden;margin-bottom:28px;">
+            <tr style="background:#f8f9ff;">
+              <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Name</th>
+              <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Learning Track</th>
+            </tr>
+            ' . $child_rows_html . '
+            <tr style="background:#f8f9ff;">
+              <td colspan="2" style="padding:10px 14px;font-size:13px;color:#555;">
+                Package: <strong style="color:#f4821f;">' . htmlspecialchars($package) . '</strong>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Payment Section -->
+      <tr>
+        <td style="padding:0 36px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff8f0;border:2px solid #f4821f;border-radius:10px;overflow:hidden;">
+            <tr>
+              <td style="background:#f4821f;padding:14px 20px;">
+                <p style="margin:0;color:#fff;font-size:15px;font-weight:800;letter-spacing:0.3px;">&#128179; Payment Details</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px;">
+                <p style="margin:0 0 14px;color:#444;font-size:15px;line-height:1.65;">
+                  To complete your registration, kindly proceed with payment using the account details below:
+                </p>
+                <table cellpadding="0" cellspacing="0" style="width:100%;">
+                  <tr>
+                    <td style="padding:7px 0;font-size:14px;color:#888;width:140px;">Account Name</td>
+                    <td style="padding:7px 0;font-size:15px;color:#1a1a2e;font-weight:700;">Traceworka Innovative Solutions Limited</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:7px 0;font-size:14px;color:#888;">Bank Name</td>
+                    <td style="padding:7px 0;font-size:15px;color:#1a1a2e;font-weight:700;">GTBank</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:7px 0;font-size:14px;color:#888;">Account Number</td>
+                    <td style="padding:7px 0;font-size:22px;color:#f4821f;font-weight:800;letter-spacing:2px;">0745519031</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- WhatsApp Instruction -->
+      <tr>
+        <td style="padding:0 36px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fff4;border:1.5px solid #2ecc71;border-radius:10px;">
+            <tr>
+              <td style="padding:18px 20px;">
+                <p style="margin:0 0 10px;color:#1a1a2e;font-size:15px;font-weight:700;">&#128241; After Making Payment</p>
+                <p style="margin:0 0 10px;color:#444;font-size:15px;line-height:1.7;">
+                  Please send the payment receipt or screenshot as evidence of payment via <strong>WhatsApp</strong> to:
+                </p>
+                <p style="margin:0 0 12px;text-align:center;font-size:26px;font-weight:900;color:#1a1a2e;letter-spacing:2px;">09071543344</p>
+                <p style="margin:0;color:#555;font-size:14px;line-height:1.65;">
+                  Please ensure that <strong>' . ($num_children > 1 ? 'the children\'s names are' : 'the child\'s name is') . '</strong> included when sending the payment confirmation to help us verify your registration promptly.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Important Notice -->
+      <tr>
+        <td style="padding:0 36px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff5f5;border:1.5px solid #e74c3c;border-radius:10px;">
+            <tr>
+              <td style="padding:16px 20px;">
+                <p style="margin:0;color:#c0392b;font-size:14px;line-height:1.65;">
+                  <strong>&#9888;&#65039; Important:</strong> Registration will only be confirmed after payment has been received and verified.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Closing -->
+      <tr>
+        <td style="padding:0 36px 36px;">
+          <p style="margin:0 0 14px;color:#444;font-size:15px;line-height:1.7;">
+            If you have any questions or require assistance, please feel free to contact us at
+            <a href="mailto:hello@traceworka.ng" style="color:#f4821f;text-decoration:none;font-weight:600;">hello@traceworka.ng</a>
+            or call <a href="tel:+2349071543344" style="color:#f4821f;text-decoration:none;font-weight:600;">+234 907 154 3344</a>.
+          </p>
+          <p style="margin:0 0 24px;color:#444;font-size:15px;line-height:1.7;">
+            We look forward to welcoming ' . ($num_children > 1 ? 'your children' : 'your child') . ' to an unforgettable summer of learning, innovation, and fun!
+          </p>
+          <p style="margin:0;color:#444;font-size:15px;">Warm regards,</p>
+          <p style="margin:4px 0 0;color:#1a1a2e;font-size:16px;font-weight:800;">Ibadan Summer Innovation Camp Team</p>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="background:#002D45;padding:20px 36px;text-align:center;">
+          <p style="margin:0 0 6px;color:rgba(255,255,255,0.6);font-size:12px;">
+            Traceworka Innovative Solutions Limited &nbsp;|&nbsp; Kongi-Bodija, Ibadan, Oyo State
+          </p>
+          <p style="margin:0;color:rgba(255,255,255,0.4);font-size:11px;">
+            &copy; 2026 Ibadan Summer Innovation Camp. All rights reserved.
+          </p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>';
+
+$headers  = "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+$headers .= "From: Ibadan Summer Innovation Camp <hello@traceworka.ng>\r\n";
+$headers .= "Reply-To: hello@traceworka.ng\r\n";
+$headers .= "X-Mailer: PHP/" . phpversion();
 @mail($email, $subject, $body, $headers);
 
 /* ===================================================
@@ -282,7 +439,7 @@ $admin_headers = "From: hello@traceworka.ng\r\nReply-To: {$email}\r\nX-Mailer: P
    Success redirect
    =================================================== */
 $success_text = $num_children === 1
-    ? "Registration submitted! Thank you, {$parent_name}. We will contact you at {$email} within 24 hours with payment details to confirm {$children[0]['fn']}'s space."
-    : "Registration submitted! Thank you, {$parent_name}. We have received details for {$child_names}. We will contact you at {$email} within 24 hours with payment information.";
+    ? "Registration submitted! Thank you, {$parent_name}. A confirmation email with payment details has been sent to {$email}. Please complete payment to secure {$children[0]['fn']}'s place."
+    : "Registration submitted! Thank you, {$parent_name}. A confirmation email with payment details has been sent to {$email}. Please complete payment to secure all {$num_children} places.";
 
 redirect('registration.php', 'reg_success', $success_text);
