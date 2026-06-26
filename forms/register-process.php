@@ -168,6 +168,47 @@ if (!empty($errors)) {
 }
 
 /* ===================================================
+   Calculate total amount payable
+   Mirrors the JS logic in registration.php exactly:
+     1 child  → full base price
+     2 children → base + round(base × 0.90)   [10% off 2nd]
+     3 children → base + round(base × 0.90) + round(base × 0.85) [10% & 15% off]
+     4+ children → group rate (no fixed total)
+   =================================================== */
+$pkg_prices = ['Early Bird' => 45000, 'Standard' => 55000, 'Premium' => 70000];
+$base_price = $pkg_prices[$package] ?? 0;
+
+$amount_rows   = [];   // per-child breakdown for email
+$total_amount  = 0;
+$is_group_rate = false;
+
+if ($num_children === 1) {
+    $amount_rows[]  = ['label' => $children[0]['fn'] . ' ' . $children[0]['ln'], 'amount' => $base_price, 'note' => ''];
+    $total_amount   = $base_price;
+} elseif ($num_children === 2) {
+    $c2_price       = (int) round($base_price * 0.90);
+    $amount_rows[]  = ['label' => $children[0]['fn'] . ' ' . $children[0]['ln'], 'amount' => $base_price,  'note' => ''];
+    $amount_rows[]  = ['label' => $children[1]['fn'] . ' ' . $children[1]['ln'], 'amount' => $c2_price,    'note' => '10% family discount'];
+    $total_amount   = $base_price + $c2_price;
+} elseif ($num_children === 3) {
+    $c2_price       = (int) round($base_price * 0.90);
+    $c3_price       = (int) round($base_price * 0.85);
+    $amount_rows[]  = ['label' => $children[0]['fn'] . ' ' . $children[0]['ln'], 'amount' => $base_price,  'note' => ''];
+    $amount_rows[]  = ['label' => $children[1]['fn'] . ' ' . $children[1]['ln'], 'amount' => $c2_price,    'note' => '10% family discount'];
+    $amount_rows[]  = ['label' => $children[2]['fn'] . ' ' . $children[2]['ln'], 'amount' => $c3_price,    'note' => '15% family discount'];
+    $total_amount   = $base_price + $c2_price + $c3_price;
+} else {
+    $is_group_rate  = true;
+    foreach ($children as $c) {
+        $amount_rows[] = ['label' => $c['fn'] . ' ' . $c['ln'], 'amount' => $base_price, 'note' => ''];
+    }
+}
+
+function fmt_naira(int $amount): string {
+    return '&#8358;' . number_format($amount);
+}
+
+/* ===================================================
    Insert one row per child
    =================================================== */
 $conn = getDBConnection();
@@ -287,6 +328,49 @@ $body = '<!DOCTYPE html>
                 Package: <strong style="color:#f4821f;">' . htmlspecialchars($package) . '</strong>
               </td>
             </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Amount Summary -->
+      <tr>
+        <td style="padding:0 36px 28px;">
+          <p style="margin:0 0 10px;color:#1a1a2e;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Amount to Pay</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8eaf0;border-radius:8px;overflow:hidden;">
+            <tr style="background:#f8f9ff;">
+              <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Child</th>
+              <th style="padding:10px 14px;text-align:right;font-size:13px;color:#555;font-weight:700;">Amount</th>
+            </tr>
+            ' . (function() use ($amount_rows, $is_group_rate, $base_price) {
+                $rows = '';
+                foreach ($amount_rows as $r) {
+                    $note = $r['note']
+                        ? ' <span style="font-size:11px;color:#27ae60;font-weight:700;background:#e8f8f0;padding:1px 6px;border-radius:10px;">' . htmlspecialchars($r['note']) . '</span>'
+                        : '';
+                    $amt  = $is_group_rate
+                        ? '<span style="font-size:12px;color:#888;">See note below</span>'
+                        : fmt_naira($r['amount']);
+                    $rows .= '<tr>
+                        <td style="padding:10px 14px;border-top:1px solid #f0f0f0;font-size:14px;color:#1a1a2e;">'
+                            . htmlspecialchars($r['label']) . $note .
+                        '</td>
+                        <td style="padding:10px 14px;border-top:1px solid #f0f0f0;font-size:14px;color:#1a1a2e;text-align:right;font-weight:600;">'
+                            . $amt .
+                        '</td>
+                    </tr>';
+                }
+                return $rows;
+            })() . '
+            ' . (!$is_group_rate ? '
+            <tr style="background:#002D45;">
+              <td style="padding:12px 14px;font-size:15px;color:#fff;font-weight:800;">Total Amount Due</td>
+              <td style="padding:12px 14px;font-size:18px;color:#f4821f;font-weight:900;text-align:right;">' . fmt_naira($total_amount) . '</td>
+            </tr>' : '
+            <tr style="background:#fff8f0;">
+              <td colspan="2" style="padding:12px 14px;font-size:13px;color:#b7600a;font-weight:600;">
+                &#9432; Group rate applies for ' . $num_children . ' children. Our team will confirm your total within 24 hours.
+              </td>
+            </tr>') . '
           </table>
         </td>
       </tr>
