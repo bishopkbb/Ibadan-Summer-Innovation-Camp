@@ -53,10 +53,10 @@ $out = fopen('php://output', 'w');
 fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
 fputcsv($out, [
-    'ID', 'First Name', 'Last Name', 'Other Name', 'Gender', 'Date of Birth', 'Age',
+    'ID', 'Camp ID', 'First Name', 'Last Name', 'Other Name', 'Gender', 'Date of Birth', 'Age',
     'School', 'Class/Grade', 'Student Address',
     'Parent/Guardian', 'Relationship', 'Phone', 'Alt Phone', 'Email', 'Parent Address',
-    'Learning Track', 'Courses',
+    'Learning Track', 'Courses', 'Mode of Instruction',
     'Medical Condition', 'Allergies', 'Emergency Contact', 'Emergency Phone', 'Emergency Relationship',
     'Package', 'No. of Children', 'Amount Due (NGN)', 'Status', 'Date Registered',
 ]);
@@ -64,6 +64,7 @@ fputcsv($out, [
 while ($row = $result->fetch_assoc()) {
     fputcsv($out, [
         $row['id'],
+        $row['camp_id'] ?? '',
         $row['first_name'],
         $row['last_name'],
         $row['other_name'] ?? '',
@@ -81,6 +82,7 @@ while ($row = $result->fetch_assoc()) {
         $row['parent_address'],
         $row['learning_track'],
         $row['courses'],
+        $row['mode_of_instruction'] ?? 'Physical',
         $row['medical_condition'] ?? '',
         $row['allergies'] ?? '',
         $row['emergency_contact'],

@@ -40,6 +40,8 @@ if (!empty($_SESSION[ADMIN_SESSION_KEY])) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin Login — ISC 2026</title>
+<link rel="icon" href="../assets/images/favicon.png" type="image/png">
+<link rel="icon" href="../assets/images/favicon-icon.svg" type="image/svg+xml">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -59,20 +61,8 @@ body {
     max-width: 420px;
     box-shadow: 0 24px 64px rgba(0,0,0,0.28);
 }
-.logo-area { text-align: center; margin-bottom: 32px; }
-.logo-area img { max-height: 80px; width: auto; }
-.logo-area h2 {
-    font-size: 17px;
-    font-weight: 700;
-    color: #002D45;
-    margin-top: 14px;
-    letter-spacing: 0.2px;
-}
-.logo-area p {
-    font-size: 13px;
-    color: #888;
-    margin-top: 4px;
-}
+.logo-area { text-align: center; margin-bottom: 32px; background:#002D45; border-radius:12px; padding:24px 20px; }
+.logo-area img { max-height: 110px; width: auto; }
 .form-group { margin-bottom: 20px; }
 .form-group label {
     display: block;
@@ -141,9 +131,7 @@ body {
 <body>
 <div class="login-card">
     <div class="logo-area">
-        <img src="../assets/Summer Camp Logos/ISC Logo.svg" alt="ISC 2026">
-        <h2>Admin Panel</h2>
-        <p>Ibadan Summer Innovation Camp 2026</p>
+        <img src="../assets/Summer%20Camp%20Logos/ISC%20Logo.svg" alt="ISC 2026" style="max-height:110px;width:auto;">
     </div>
 
     <?php if ($error): ?>

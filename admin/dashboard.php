@@ -2,6 +2,15 @@
 session_start();
 require_once('config.php');
 require_once('../config/db.php');
+require_once('../config/app.php');
+
+$_mailer_available = file_exists(__DIR__ . '/../vendor/autoload.php');
+if ($_mailer_available) {
+    require_once('../config/mailer.php');
+} else {
+    function sendMail(): bool { return false; }
+}
+require_once('mail-helper.php');
 
 /* ── Auth guard ── */
 if (empty($_SESSION[ADMIN_SESSION_KEY])) {
@@ -22,10 +31,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id     = (int) $_POST['reg_id'];
             $status = in_array($_POST['new_status'] ?? '', ['pending','confirmed','cancelled'])
                       ? $_POST['new_status'] : 'pending';
+
+            /* Fetch current record before update (needed for status-change email) */
+            $fs = $conn->prepare('SELECT status, email, parent_name, first_name, last_name, learning_track, courses, mode_of_instruction, camp_id, package FROM registrations WHERE id = ?');
+            $fs->bind_param('i', $id);
+            $fs->execute();
+            $reg_row    = $fs->get_result()->fetch_assoc();
+            $fs->close();
+            $prev_status = $reg_row['status'] ?? '';
+
             $stmt = $conn->prepare('UPDATE registrations SET status = ? WHERE id = ?');
             $stmt->bind_param('si', $status, $id);
             $stmt->execute();
             $stmt->close();
+
+            if ($reg_row && $prev_status !== $status && in_array($status, ['confirmed','cancelled'])) {
+                $email_sent = sendRegistrationStatusEmail($reg_row, $status);
+                $child_name = trim(($reg_row['first_name'] ?? '') . ' ' . ($reg_row['last_name'] ?? ''));
+                if ($email_sent) {
+                    $_SESSION['admin_notice'] = ['type' => 'success', 'msg' => "Status set to <strong>" . ucfirst($status) . "</strong> and confirmation email sent to <strong>" . htmlspecialchars($reg_row['email']) . "</strong>."];
+                } else {
+                    $_SESSION['admin_notice'] = ['type' => 'warning', 'msg' => "Status set to <strong>" . ucfirst($status) . "</strong> but the email to <strong>" . htmlspecialchars($reg_row['email']) . "</strong> could not be sent. Check the server error log."];
+                }
+            }
         }
 
         if ($_POST['action'] === 'mark_read' && !empty($_POST['msg_id'])) {
@@ -37,11 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    $conn->close();
     header('Location: dashboard.php?' . http_build_query(array_filter([
         'tab'     => $_GET['tab']     ?? 'registrations',
         'package' => $_GET['package'] ?? '',
         'track'   => $_GET['track']   ?? '',
         'status'  => $_GET['status']  ?? '',
+        'mode'    => $_GET['mode']    ?? '',
         'search'  => $_GET['search']  ?? '',
         'page'    => $_GET['page']    ?? '',
     ])));
@@ -51,14 +81,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* ============================================================
    Filters & Pagination
    ============================================================ */
-$tab     = in_array($_GET['tab'] ?? '', ['registrations','messages']) ? $_GET['tab'] : 'registrations';
-$pkg     = $_GET['package'] ?? '';
-$track   = $_GET['track']   ?? '';
-$status  = $_GET['status']  ?? '';
-$search  = trim($_GET['search'] ?? '');
-$page    = max(1, (int)($_GET['page'] ?? 1));
-$perPage = 25;
-$offset  = ($page - 1) * $perPage;
+$tab         = in_array($_GET['tab'] ?? '', ['registrations','messages']) ? $_GET['tab'] : 'registrations';
+$pkg         = $_GET['package'] ?? '';
+$track       = $_GET['track']   ?? '';
+$status      = $_GET['status']  ?? '';
+$mode_filter = in_array($_GET['mode'] ?? '', ['Physical','Virtual']) ? ($_GET['mode'] ?? '') : '';
+$search      = trim($_GET['search'] ?? '');
+$page        = max(1, (int)($_GET['page'] ?? 1));
+$perPage     = 25;
+$offset      = ($page - 1) * $perPage;
 
 /* ── Stats ── */
 $stats = [];
@@ -74,9 +105,10 @@ $where  = [];
 $params = [];
 $types  = '';
 
-if ($pkg)    { $where[] = 'package = ?';        $params[] = $pkg;    $types .= 's'; }
-if ($track)  { $where[] = 'learning_track = ?'; $params[] = $track;  $types .= 's'; }
-if ($status) { $where[] = 'status = ?';         $params[] = $status; $types .= 's'; }
+if ($pkg)         { $where[] = 'package = ?';             $params[] = $pkg;         $types .= 's'; }
+if ($track)       { $where[] = 'learning_track = ?';      $params[] = $track;       $types .= 's'; }
+if ($status)      { $where[] = 'status = ?';              $params[] = $status;      $types .= 's'; }
+if ($mode_filter) { $where[] = 'mode_of_instruction = ?'; $params[] = $mode_filter; $types .= 's'; }
 if ($search) {
     $like = '%' . $search . '%';
     $where[]  = '(first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR phone LIKE ?)';
@@ -138,6 +170,8 @@ $conn->close();
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?php echo ADMIN_TITLE; ?></title>
+<link rel="icon" href="../assets/images/favicon.png" type="image/png">
+<link rel="icon" href="../assets/images/favicon-icon.svg" type="image/svg+xml">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f7; color: #1a1a2e; min-height: 100vh; }
@@ -162,6 +196,8 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f7; colo
 .topbar-right { display: flex; align-items: center; gap: 18px; font-size: 14px; }
 .topbar-right a { color: rgba(255,255,255,0.75); text-decoration: none; }
 .topbar-right a:hover { color: #f4821f; }
+.topbar-right .btn-orange,
+.topbar-right .btn-orange:hover { color: #fff; }
 .badge-red { background: #e74c3c; color: #fff; border-radius: 50px; font-size: 11px; font-weight: 700; padding: 1px 7px; margin-left: 4px; }
 
 /* ── Main layout ── */
@@ -328,6 +364,13 @@ tbody tr:hover td { background: #fafbff; }
 
 <main class="main">
 
+<?php if (!empty($_SESSION['admin_notice'])): $notice = $_SESSION['admin_notice']; unset($_SESSION['admin_notice']); ?>
+<div style="margin:0 0 20px;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:600;
+    <?php echo $notice['type'] === 'success' ? 'background:#d4edda;border:1px solid #b7dfc6;color:#155724;' : 'background:#fff3cd;border:1px solid #ffeeba;color:#856404;'; ?>">
+    <?php echo $notice['msg']; ?>
+</div>
+<?php endif; ?>
+
     <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card blue">
@@ -412,6 +455,14 @@ tbody tr:hover td { background: #fafbff; }
                     <?php endforeach; ?>
                 </select>
             </div>
+            <div class="fb-group">
+                <label>Mode</label>
+                <select name="mode">
+                    <option value="">All Modes</option>
+                    <option value="Physical" <?php echo $mode_filter === 'Physical' ? 'selected' : ''; ?>>&#127979; Physical</option>
+                    <option value="Virtual"  <?php echo $mode_filter === 'Virtual'  ? 'selected' : ''; ?>>&#128187; Virtual</option>
+                </select>
+            </div>
             <div class="fb-group" style="justify-content:flex-end;">
                 <button type="submit" class="btn btn-orange">Filter</button>
                 <a href="?tab=registrations" class="btn btn-navy" style="margin-top:0;">Reset</a>
@@ -438,9 +489,11 @@ tbody tr:hover td { background: #fafbff; }
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Camp ID</th>
                         <th>Student</th>
                         <th>Age</th>
                         <th>Track</th>
+                        <th>Mode</th>
                         <th>Package</th>
                         <th>Amount Due</th>
                         <th>Parent</th>
@@ -455,6 +508,7 @@ tbody tr:hover td { background: #fafbff; }
                 <?php foreach ($registrations as $r): ?>
                 <tr>
                     <td class="text-muted nowrap"><?php echo $r['id']; ?></td>
+                    <td class="nowrap" style="font-weight:800;color:#002D45;letter-spacing:1px;font-size:12px;"><?php echo htmlspecialchars($r['camp_id'] ?? '—'); ?></td>
                     <td class="nowrap">
                         <strong><?php echo htmlspecialchars($r['first_name'] . ' ' . $r['last_name']); ?></strong>
                         <div class="text-muted"><?php echo htmlspecialchars($r['gender']); ?> · <?php echo htmlspecialchars($r['school']); ?></div>
@@ -463,6 +517,9 @@ tbody tr:hover td { background: #fafbff; }
                     <td class="nowrap">
                         <?php echo htmlspecialchars($r['learning_track']); ?>
                         <div class="text-muted" style="max-width:160px;white-space:normal;"><?php echo htmlspecialchars($r['courses']); ?></div>
+                    </td>
+                    <td class="nowrap" style="font-size:13px;">
+                        <?php echo ($r['mode_of_instruction'] ?? 'Physical') === 'Virtual' ? '&#128187; Virtual' : '&#127979; Physical'; ?>
                     </td>
                     <td class="nowrap">
                         <?php

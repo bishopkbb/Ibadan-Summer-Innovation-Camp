@@ -4,7 +4,8 @@
 Options -Indexes
 
 # ── Custom error pages ────────────────────────────────────────
-ErrorDocument 404 /404.php
+ErrorDocument 404 /summercamp/404.php
+ErrorDocument 500 /summercamp/404.php
 
 # ── HTTPS redirect (active — requires SSL certificate in cPanel) ──
 RewriteEngine On

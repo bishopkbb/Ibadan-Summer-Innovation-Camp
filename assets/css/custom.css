@@ -147,11 +147,6 @@
     margin-bottom: 20px;
 }
 
-/* --- Get In Touch: push walking-figure pattern below the contact list so it stands alone --- */
-#contact-quick .registration-one_pattern {
-    bottom: -60px;
-}
-
 /* --- Final CTA: orange border reveals on hover against the dark navy overlay --- */
 .final-cta-btn {
     border: 2px solid transparent;
@@ -205,6 +200,13 @@
 
 .team-block_one-inner:hover .team-block_one-image img {
     transform: scale(1.08);
+}
+
+/* --- Get In Touch: white icon circle on hover, icon stays white --- */
+#contact-quick .choose-block_one-inner:hover .choose-block_one-icon {
+    background-color: #ffffff;
+    color: #f4821f;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
 }
 
 /* ============================================================

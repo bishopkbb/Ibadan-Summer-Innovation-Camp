@@ -2,6 +2,15 @@
 session_start();
 require_once('config.php');
 require_once('../config/db.php');
+require_once('../config/app.php');
+
+$_mailer_available = file_exists(__DIR__ . '/../vendor/autoload.php');
+if ($_mailer_available) {
+    require_once('../config/mailer.php');
+} else {
+    function sendMail(): bool { return false; }
+}
+require_once('mail-helper.php');
 
 if (empty($_SESSION[ADMIN_SESSION_KEY])) {
     header('Location: index.php');
@@ -16,29 +25,45 @@ if ($id <= 0) {
 
 $conn = getDBConnection();
 
-// Handle admin notes update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_notes'])) {
-    $notes  = htmlspecialchars(strip_tags(trim($_POST['admin_notes'])), ENT_QUOTES, 'UTF-8');
-    $status = in_array($_POST['status'] ?? '', ['pending','confirmed','cancelled']) ? $_POST['status'] : 'pending';
-    $stmt   = $conn->prepare('UPDATE registrations SET admin_notes = ?, status = ? WHERE id = ?');
-    $stmt->bind_param('ssi', $notes, $status, $id);
-    $stmt->execute();
-    $stmt->close();
-    header('Location: view.php?id=' . $id . '&saved=1');
-    exit;
-}
-
+/* Fetch registration first — needed in both GET and POST paths */
 $stmt = $conn->prepare('SELECT * FROM registrations WHERE id = ?');
 $stmt->bind_param('i', $id);
 $stmt->execute();
 $r = $stmt->get_result()->fetch_assoc();
 $stmt->close();
-$conn->close();
 
 if (!$r) {
+    $conn->close();
     header('Location: dashboard.php');
     exit;
 }
+
+/* Handle admin notes / status update */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_notes'])) {
+    $notes      = htmlspecialchars(strip_tags(trim($_POST['admin_notes'])), ENT_QUOTES, 'UTF-8');
+    $new_status = in_array($_POST['status'] ?? '', ['pending','confirmed','cancelled']) ? $_POST['status'] : 'pending';
+    $prev_status = $r['status'];
+
+    $upd = $conn->prepare('UPDATE registrations SET admin_notes = ?, status = ? WHERE id = ?');
+    $upd->bind_param('ssi', $notes, $new_status, $id);
+    $upd->execute();
+    $upd->close();
+
+    if ($prev_status !== $new_status && in_array($new_status, ['confirmed','cancelled'])) {
+        $email_sent = sendRegistrationStatusEmail($r, $new_status);
+        if ($email_sent) {
+            $_SESSION['admin_notice'] = ['type' => 'success', 'msg' => "Status set to <strong>" . ucfirst($new_status) . "</strong> and confirmation email sent to <strong>" . htmlspecialchars($r['email'] ?? '') . "</strong>."];
+        } else {
+            $_SESSION['admin_notice'] = ['type' => 'warning', 'msg' => "Status set to <strong>" . ucfirst($new_status) . "</strong> but the email to <strong>" . htmlspecialchars($r['email'] ?? '') . "</strong> could not be sent. Check the server error log."];
+        }
+    }
+
+    $conn->close();
+    header('Location: view.php?id=' . $id . '&saved=1');
+    exit;
+}
+
+$conn->close();
 
 $saved = !empty($_GET['saved']);
 
@@ -63,6 +88,8 @@ $statusColors = [
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Registration #<?php echo $r['id']; ?> — ISC 2026 Admin</title>
+<link rel="icon" href="../assets/images/favicon.png" type="image/png">
+<link rel="icon" href="../assets/images/favicon-icon.svg" type="image/svg+xml">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f7;color:#1a1a2e;min-height:100vh;}
@@ -99,6 +126,12 @@ table{width:100%;border-collapse:collapse;}
 
 <?php if ($saved): ?>
 <div class="alert-success">✓ Changes saved successfully.</div>
+<?php endif; ?>
+<?php if (!empty($_SESSION['admin_notice'])): $notice = $_SESSION['admin_notice']; unset($_SESSION['admin_notice']); ?>
+<div style="margin-bottom:16px;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:600;
+    <?php echo $notice['type'] === 'success' ? 'background:#d4edda;border:1px solid #b7dfc6;color:#155724;' : 'background:#fff3cd;border:1px solid #ffeeba;color:#856404;'; ?>">
+    <?php echo $notice['msg']; ?>
+</div>
 <?php endif; ?>
 
 <!-- Summary Bar -->
@@ -171,8 +204,11 @@ table{width:100%;border-collapse:collapse;}
     </div>
     <table>
         <?php
+        row('Camp ID', '<span style="font-size:18px;font-weight:900;color:#002D45;letter-spacing:3px;">' . htmlspecialchars($r['camp_id'] ?? 'Not yet assigned') . '</span>');
         row('Learning Track', '<strong>' . htmlspecialchars($r['learning_track']) . '</strong>');
         row('Courses Selected', htmlspecialchars($r['courses']));
+        $mode_display = ($r['mode_of_instruction'] ?? 'Physical') === 'Virtual' ? '&#128187; Virtual' : '&#127979; Physical';
+        row('Mode of Instruction', '<strong>' . $mode_display . '</strong>');
         row('Package', '<strong style="color:#f4821f;">' . htmlspecialchars($r['package']) . '</strong>');
         row('No. of Children (family)', (string)$r['number_of_children']);
         row('Amount Due', !empty($r['amount_to_pay']) ? '<strong>&#8358;' . number_format((int)$r['amount_to_pay']) . '</strong>' : 'Group rate');
@@ -234,7 +270,8 @@ table{width:100%;border-collapse:collapse;}
                 <textarea name="admin_notes" rows="3" style="width:100%;padding:10px 14px;border:1.5px solid #dde1ea;border-radius:8px;font-size:14px;color:#1a1a2e;background:#f8f9ff;resize:vertical;"><?php echo htmlspecialchars($r['admin_notes'] ?? ''); ?></textarea>
             </div>
         </div>
-        <div style="margin-top:16px;display:flex;gap:12px;">
+        <p style="margin-top:14px;font-size:12px;color:#888;">&#9993; Changing status to <strong>Confirmed</strong> or <strong>Cancelled</strong> will automatically email the parent.</p>
+        <div style="margin-top:10px;display:flex;gap:12px;">
             <button type="submit" class="btn btn-orange">Save Changes</button>
             <a href="dashboard.php" class="btn btn-navy">← Back to Dashboard</a>
         </div>

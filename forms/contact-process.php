@@ -1,7 +1,15 @@
 <?php
 session_start();
 require_once('../config/db.php');
-require_once('../config/mailer.php');
+require_once('../config/app.php');
+
+$_mailer_available = file_exists(__DIR__ . '/../vendor/autoload.php');
+if ($_mailer_available) {
+    require_once('../config/mailer.php');
+} else {
+    error_log('ISC Contact: vendor/autoload.php not found — emails will not be sent.');
+    function sendMail(): bool { return false; }
+}
 
 function sanitize(string $val): string {
     return htmlspecialchars(strip_tags(trim($val)), ENT_QUOTES, 'UTF-8');
@@ -9,7 +17,7 @@ function sanitize(string $val): string {
 
 function redirect(string $page, string $key, string $msg): never {
     $_SESSION[$key] = $msg;
-    header('Location: ../' . $page);
+    header('Location: ' . SITE_URL . '/' . $page);
     exit;
 }
 

@@ -2,7 +2,8 @@
 session_start();
 require_once('config/db.php');
 
-$total_seats = 103;
+require_once('config/app.php');
+$total_seats = TOTAL_SEATS;
 $seats_remaining = $total_seats;
 try {
     $conn = getDBConnection();
@@ -406,11 +407,62 @@ include('includes/navbar.php');
 	</section>
 	<!-- End Why Choose Us -->
 
+	<!-- How to Attend Section -->
+	<section style="background:linear-gradient(135deg,#f4f6f9 0%,#eef2f8 100%);padding:80px 0;" id="class-format">
+		<div class="auto-container">
+			<div class="sec-title centered">
+				<div class="sec-title_title">How to Attend</div>
+				<h2 class="sec-title_heading">Physical &amp; Virtual <br><span>Classes Available</span></h2>
+				<div class="sec-title_text" style="max-width:660px;margin:0 auto;">Choose the attendance mode that works best for your family. Join us live in Ibadan or participate from anywhere via our virtual platform. Same curriculum, same instructors.</div>
+			</div>
+			<div class="row clearfix" style="margin-top:44px;justify-content:center;">
+
+				<div class="col-lg-5 col-md-6 col-sm-12" style="margin-bottom:30px;">
+					<div style="background:#fff;border-radius:20px;padding:40px 36px;height:100%;box-shadow:0 6px 30px rgba(0,45,69,0.10);border-top:5px solid #002D45;">
+						<div style="font-size:50px;margin-bottom:18px;text-align:center;">&#127979;</div>
+						<h3 style="text-align:center;color:#002D45;font-size:22px;font-weight:800;margin-bottom:16px;">Physical Classes</h3>
+						<p style="color:#555;font-size:15px;line-height:1.75;margin-bottom:24px;text-align:center;">Attend live in-person at our Innovation Hub in Kongi-Bodija, Ibadan. Experience hands-on labs, direct mentorship, and the full camp energy.</p>
+						<ul style="list-style:none;padding:0;margin:0;">
+							<li style="padding:10px 0;border-bottom:1px solid #f0f2f7;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Face-to-face mentorship &amp; coaching</li>
+							<li style="padding:10px 0;border-bottom:1px solid #f0f2f7;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Hands-on lab access &amp; equipment</li>
+							<li style="padding:10px 0;border-bottom:1px solid #f0f2f7;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Peer collaboration &amp; teamwork</li>
+							<li style="padding:10px 0;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Grand graduation &amp; showcase ceremony</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-lg-5 col-md-6 col-sm-12" style="margin-bottom:30px;">
+					<div style="background:#fff;border-radius:20px;padding:40px 36px;height:100%;box-shadow:0 6px 30px rgba(244,130,31,0.13);border-top:5px solid #f4821f;">
+						<div style="font-size:50px;margin-bottom:18px;text-align:center;">&#128187;</div>
+						<h3 style="text-align:center;color:#f4821f;font-size:22px;font-weight:800;margin-bottom:16px;">Virtual Classes</h3>
+						<p style="color:#555;font-size:15px;line-height:1.75;margin-bottom:24px;text-align:center;">Can't make it to Ibadan? Join all sessions live online from anywhere in the world. Same quality, same instructors, delivered through our interactive virtual platform.</p>
+						<ul style="list-style:none;padding:0;margin:0;">
+							<li style="padding:10px 0;border-bottom:1px solid #f0f2f7;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Attend from anywhere globally</li>
+							<li style="padding:10px 0;border-bottom:1px solid #f0f2f7;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Live interactive sessions with instructors</li>
+							<li style="padding:10px 0;border-bottom:1px solid #f0f2f7;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Session recordings &amp; digital resources</li>
+							<li style="padding:10px 0;font-size:14px;color:#444;display:flex;align-items:center;gap:10px;"><i class="flaticon-checked" style="color:#f4821f;font-size:13px;flex-shrink:0;"></i> Full camp community participation</li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+			<div style="text-align:center;margin-top:20px;">
+				<a href="registration.php" class="theme-btn btn-style-one">
+					<span class="btn-wrap">
+						<span class="text-one">Register Now and Choose Your Mode <i class="flaticon-next-1"></i></span>
+						<span class="text-two">Register Now and Choose Your Mode <i class="flaticon-next-1"></i></span>
+					</span>
+				</a>
+			</div>
+		</div>
+	</section>
+	<!-- End How to Attend -->
+
 	<!-- Learning Tracks Section -->
 	<section class="program-one" id="learning-tracks">
 		<div class="program-one_icon" style="background-image:url(assets/images/icons/icon-4.png)"></div>
 		<div class="auto-container">
-			<div class="sec-title">
+			<div class="sec-title centered">
 				<div class="sec-title_title">Our Programmes</div>
 				<h2 class="sec-title_heading">4 Exciting <span>Learning Tracks</span> <br> to Explore</h2>
 			</div>
@@ -871,105 +923,68 @@ include('includes/navbar.php');
 	</section>
 	<!-- End Final CTA -->
 
-	<!-- Contact Quick Section -->
-	<section class="registration-one" id="contact-quick">
-		<div class="registration-one_pattern" style="background-image:url(assets/images/background/pattern-1.png)"></div>
+	<!-- Contact Section -->
+	<section class="choose-one" id="contact-quick">
 		<div class="auto-container">
-			<div class="row clearfix">
 
-				<div class="registration-one_title-column col-lg-6 col-md-12 col-sm-12">
-					<div class="registration-one_title-outer">
-						<div class="sec-title title-anim">
-							<div class="sec-title_title">Get In Touch</div>
-							<h2 class="sec-title_heading">Have Questions? <br> <span>Contact Us</span> Today</h2>
-							<div class="sec-title_text">We're here to help you make the right choice for your child's future. Reach out to us through any of the channels below.</div>
+			<div class="sec-title centered" style="margin-bottom:50px;">
+				<div class="sec-title_title">Get In Touch</div>
+				<h2 class="sec-title_heading">Have Questions? <br> <span>Contact Us</span> Today</h2>
+				<div class="sec-title_text" style="max-width:620px;margin:0 auto;">We are here to help you make the right choice for your child's future. Reach out through any of the channels below.</div>
+			</div>
+
+			<div class="row clearfix" style="justify-content:center;">
+
+				<div class="choose-block_one col-lg-4 col-md-6 col-sm-12">
+					<div class="choose-block_one-inner">
+						<div class="choose-block_one-content">
+							<div class="choose-block_one-icon"><i class="flaticon-call"></i></div>
+							<h2 class="choose-block_one-title">Call Us</h2>
+							<div class="choose-block_one-text">
+								<a href="tel:+2349071543344" style="display:block;color:inherit;text-decoration:none;margin-bottom:4px;">+234 907 154 3344</a>
+								<a href="tel:+2348135235891" style="display:block;color:inherit;text-decoration:none;">+234 813 523 5891</a>
+							</div>
 						</div>
-						<ul class="registration-one_list">
-							<li>
-								<i class="icon flaticon-call"></i>
-								Call Us Now<br>
-								<a href="tel:+2349071543344">+234 907 154 3344</a><br>
-								<a href="tel:+2348135235891">+234 813 523 5891</a>
-							</li>
-							<li>
-								<i class="icon flaticon-arroba"></i>
-								Email Us<br>
-								<a href="mailto:summercamp@traceworka.ng">summercamp@traceworka.ng</a>
-							</li>
-							<li>
-								<i class="icon flaticon-maps-and-flags"></i>
-								Our Location<br>
-								<a href="contact.php">No 6, Hon Tunde Sarumi Close, Off Adenuga Street, Kongi-Bodija, Ibadan</a>
-							</li>
-						</ul>
 					</div>
 				</div>
 
-				<div class="registration-one_form-column col-lg-6 col-md-12 col-sm-12">
-					<div class="registration-one_form-outer">
-						<h3 class="registration-one_title">Quick Registration</h3>
-						<div class="default-form">
-							<form method="post" action="forms/register-process.php" id="quick-registration-form" novalidate>
-								<?php
-								$token = bin2hex(random_bytes(32));
-								$_SESSION['csrf_token'] = $token;
-								?>
-								<input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
-								<div class="row clearfix">
-									<div class="col-lg-6 col-md-6 col-sm-12 form-group">
-										<label>Child's First Name</label>
-										<input type="text" name="first_name" placeholder="" required>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-12 form-group">
-										<label>Child's Last Name</label>
-										<input type="text" name="last_name" placeholder="" required>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-12 form-group">
-										<label>Parent/Guardian Email</label>
-										<input type="email" name="email" placeholder="" required>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-12 form-group">
-										<label>Phone Number</label>
-										<input type="tel" name="phone" placeholder="" required>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-12 form-group">
-										<label>Child's Age</label>
-										<select name="age_group" class="custom-select-box">
-											<option value="">Select Age Group</option>
-											<option value="7-10">7–10 Years (Junior Innovators)</option>
-											<option value="11-14">11–14 Years (Young Creators)</option>
-											<option value="15-18">15–18 Years (Future Leaders)</option>
-										</select>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-12 form-group">
-										<label>Package</label>
-										<select name="package" class="custom-select-box">
-											<option value="">Select Package</option>
-											<option value="Early Bird" <?php echo $early_bird_expired ? 'disabled style="color:#bbb;"' : ''; ?>>Early Bird – ₦45,000<?php echo $early_bird_expired ? ' (Expired)' : ''; ?></option>
-											<option value="Standard">Standard – ₦55,000</option>
-											<option value="Premium">Premium – ₦70,000</option>
-										</select>
-									</div>
-									<div class="col-lg-12 col-md-12 col-sm-12 form-group">
-										<button type="submit" class="theme-btn btn-style-two">
-											<span class="btn-wrap">
-												<span class="text-one">Submit &amp; Register <i class="flaticon-next-1"></i></span>
-												<span class="text-two">Submit &amp; Register <i class="flaticon-next-1"></i></span>
-											</span>
-										</button>
-									</div>
-									<div class="col-lg-12" style="margin-top:10px;">
-										<p style="font-size:13px;color:#fff;opacity:0.85;">For the full registration form with all details, <a href="registration.php" style="color:#fff;font-weight:600;text-decoration:underline;">click here</a>.</p>
-									</div>
-								</div>
-							</form>
+				<div class="choose-block_one col-lg-4 col-md-6 col-sm-12">
+					<div class="choose-block_one-inner">
+						<div class="choose-block_one-content">
+							<div class="choose-block_one-icon"><i class="flaticon-arroba"></i></div>
+							<h2 class="choose-block_one-title">Email Us</h2>
+							<div class="choose-block_one-text">
+								<a href="mailto:summercamp@traceworka.ng" style="color:inherit;text-decoration:none;word-break:break-all;">summercamp@traceworka.ng</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="choose-block_one col-lg-4 col-md-6 col-sm-12">
+					<div class="choose-block_one-inner">
+						<div class="choose-block_one-content">
+							<div class="choose-block_one-icon"><i class="flaticon-maps-and-flags"></i></div>
+							<h2 class="choose-block_one-title">Our Location</h2>
+							<div class="choose-block_one-text">
+								<a href="contact.php" style="color:inherit;text-decoration:none;line-height:1.75;">No 6, Hon Tunde Sarumi Close, Off Adenuga Street, Kongi-Bodija, Ibadan</a>
+							</div>
 						</div>
 					</div>
 				</div>
 
 			</div>
+
+			<div style="text-align:center;margin-top:20px;">
+				<a href="registration.php" class="theme-btn btn-style-one">
+					<span class="btn-wrap">
+						<span class="text-one">Register Your Child Now <i class="flaticon-next-1"></i></span>
+						<span class="text-two">Register Your Child Now <i class="flaticon-next-1"></i></span>
+					</span>
+				</a>
+			</div>
+
 		</div>
 	</section>
-	<!-- End Contact Quick Section -->
+	<!-- End Contact Section -->
 
 <?php include('includes/footer.php'); ?>

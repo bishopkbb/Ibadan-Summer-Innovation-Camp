@@ -1,7 +1,16 @@
 <?php
 session_start();
 require_once('../config/db.php');
-require_once('../config/mailer.php');
+require_once('../config/app.php');
+
+// Load mailer only if vendor/autoload.php exists — prevents fatal crash if vendor/ missing on server
+$_mailer_available = file_exists(__DIR__ . '/../vendor/autoload.php');
+if ($_mailer_available) {
+    require_once('../config/mailer.php');
+} else {
+    error_log('ISC Register: vendor/autoload.php not found — emails will not be sent. Upload vendor/ folder to the server.');
+    function sendMail(): bool { return false; }
+}
 
 /* ===================================================
    Helpers
@@ -12,7 +21,7 @@ function sanitize(string $val): string {
 
 function redirect(string $page, string $key, string $msg): never {
     $_SESSION[$key] = $msg;
-    header('Location: ../' . $page);
+    header('Location: ' . SITE_URL . '/' . $page);
     exit;
 }
 
@@ -91,7 +100,8 @@ for ($i = 0; $i < $num_children; $i++) {
     $grade    = sanitize(postArr('class_grade',   $i));
     $addr     = sanitize(postArr('address',       $i));
     $track    = sanitize(postArr('learning_track',$i));
-    $craw     = sanitize(postArr('courses',       $i));
+    $craw     = strip_tags(trim((string)($_POST['courses'][$i] ?? '')));
+    $mode     = sanitize(postArr('mode_of_instruction', $i));
     $med_cond = sanitize(postArr('medical_condition', $i));
     $allergies= sanitize(postArr('allergies',     $i));
     $em_name  = sanitize(postArr('emergency_contact',      $i));
@@ -110,19 +120,22 @@ for ($i = 0; $i < $num_children; $i++) {
             $errors[] = "$lbl: Invalid date of birth.";
         } else {
             $dob = $dobObj->format('Y-m-d');
-            $calc_age = (new DateTime())->diff($dobObj)->y;
+            $camp_start = new DateTime('2026-08-03');
+            $calc_age = (int)$camp_start->diff($dobObj)->y;
             if ($calc_age < 7 || $calc_age > 18) {
-                $errors[] = "$lbl: Age must be between 7 and 18 years.";
+                $errors[] = "$lbl: Age must be between 7 and 18 years (as of camp start, August 3 2026).";
             }
+            /* Use DOB-calculated camp-start age as the canonical value for DB storage */
+            $age = $calc_age;
         }
     } else {
         $errors[] = "$lbl: Date of birth is required.";
     }
 
-    if ($age < 7 || $age > 18)  $errors[] = "$lbl: Please select a valid age (7–18).";
+    /* Age dropdown check removed — DOB calculation above is authoritative */
     if (strlen($school) < 3)    $errors[] = "$lbl: School name is required.";
     if (strlen($grade) < 1)     $errors[] = "$lbl: Class / grade is required.";
-    if (strlen($addr) < 5)      $errors[] = "$lbl: Home address is required.";
+    if (strlen($addr) < 2)      $errors[] = "$lbl: Home address is required.";
 
     /* track & courses */
     if (!in_array($track, $allowed_tracks)) {
@@ -135,8 +148,10 @@ for ($i = 0; $i < $num_children; $i++) {
             if (in_array($c, $valid)) $selected_courses[] = $c;
         }
     }
-    if (empty($selected_courses)) $errors[] = "$lbl: Please select at least one course.";
+    if (empty($selected_courses)) $errors[] = "$lbl: Please select a course.";
     $courses_str = implode(', ', $selected_courses);
+
+    if (!in_array($mode, ['Physical','Virtual'])) $errors[] = "$lbl: Please select a mode of instruction (Physical or Virtual).";
 
     /* emergency contact */
     if (strlen($em_name) < 3) $errors[] = "$lbl: Emergency contact name is required.";
@@ -144,7 +159,7 @@ for ($i = 0; $i < $num_children; $i++) {
         $errors[] = "$lbl: Please enter a valid emergency contact phone.";
     }
 
-    $children[] = compact('fn','ln','on','gender','dob','age','school','grade','addr','track','courses_str','med_cond','allergies','em_name','em_phone','em_rel');
+    $children[] = compact('fn','ln','on','gender','dob','age','school','grade','addr','track','courses_str','mode','med_cond','allergies','em_name','em_phone','em_rel');
 }
 
 /* ===================================================
@@ -154,7 +169,7 @@ if (strlen($parent_name) < 3)   $errors[] = 'Parent/guardian name is required.';
 if (empty($relationship))        $errors[] = 'Relationship to student is required.';
 if (!preg_match('/^[+]?[\d\s\-()]{7,20}$/', $phone)) $errors[] = 'Please enter a valid phone number.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL))        $errors[] = 'Please enter a valid email address.';
-if (strlen($parent_address) < 5) $errors[] = 'Parent/guardian address is required.';
+if (strlen($parent_address) < 2) $errors[] = 'Parent/guardian address is required.';
 
 if (!in_array($package, ['Early Bird','Standard','Premium'])) {
     $errors[] = 'Please select a valid package.';
@@ -227,7 +242,7 @@ $stmt = $conn->prepare("
         first_name, last_name, other_name, gender, date_of_birth, age,
         school, class_grade, address,
         parent_name, relationship, phone, alt_phone, email, parent_address,
-        learning_track, courses,
+        learning_track, courses, mode_of_instruction,
         medical_condition, allergies,
         emergency_contact, emergency_phone, emergency_relationship,
         package, number_of_children, amount_to_pay,
@@ -236,7 +251,7 @@ $stmt = $conn->prepare("
         ?, ?, ?, ?, ?, ?,
         ?, ?, ?,
         ?, ?, ?, ?, ?, ?,
-        ?, ?,
+        ?, ?, ?,
         ?, ?,
         ?, ?, ?,
         ?, ?, ?,
@@ -251,13 +266,21 @@ if (!$stmt) {
 
 $db_amount = $is_group_rate ? null : $total_amount;
 
-foreach ($children as $child) {
+$cupd = $conn->prepare('UPDATE registrations SET camp_id = ? WHERE id = ?');
+if (!$cupd) {
+    $conn->rollback();
+    $stmt->close();
+    $conn->close();
+    redirect('registration.php', 'reg_error', 'A server error occurred. Please try again or contact us at summercamp@traceworka.ng.');
+}
+
+foreach ($children as $idx => $child) {
     $stmt->bind_param(
-        'sssssisssssssssssssssssii',
+        'sssssissssssssssssssssssii',
         $child['fn'], $child['ln'], $child['on'], $child['gender'], $child['dob'], $child['age'],
         $child['school'], $child['grade'], $child['addr'],
         $parent_name, $relationship, $phone, $alt_phone, $email, $parent_address,
-        $child['track'], $child['courses_str'],
+        $child['track'], $child['courses_str'], $child['mode'],
         $child['med_cond'], $child['allergies'],
         $child['em_name'], $child['em_phone'], $child['em_rel'],
         $package, $num_children, $db_amount
@@ -267,13 +290,21 @@ foreach ($children as $child) {
         $conn->rollback();
         error_log('Execute failed: ' . $stmt->error);
         $stmt->close();
+        $cupd->close();
         $conn->close();
         redirect('registration.php', 'reg_error', 'Registration could not be saved. Please try again or contact us at summercamp@traceworka.ng.');
     }
+
+    $insert_id = $conn->insert_id;
+    $camp_id   = 'ISC26-' . str_pad($insert_id, 4, '0', STR_PAD_LEFT);
+    $cupd->bind_param('si', $camp_id, $insert_id);
+    $cupd->execute();
+    $children[$idx]['camp_id'] = $camp_id;
 }
 
 $conn->commit();
 $stmt->close();
+$cupd->close();
 $conn->close();
 
 /* ===================================================
@@ -284,14 +315,22 @@ $child_names = implode(' & ', array_map(fn($c) => $c['fn'] . ' ' . $c['ln'], $ch
 /* Build the registered children summary rows */
 $child_rows_html = '';
 foreach ($children as $idx => $c) {
-    $label = $num_children > 1 ? ($idx + 1) . '. ' : '';
+    $label     = $num_children > 1 ? ($idx + 1) . '. ' : '';
+    $mode_icon = ($c['mode'] ?? 'Physical') === 'Virtual' ? '&#128187; Virtual' : '&#127979; Physical';
     $child_rows_html .= '
         <tr>
-            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#1a1a2e;font-size:15px;">
+            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#1a1a2e;font-size:14px;font-weight:700;">
                 ' . htmlspecialchars($label . $c['fn'] . ' ' . $c['ln']) . '
             </td>
-            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#555;font-size:15px;">
-                ' . htmlspecialchars($c['track']) . '
+            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#555;font-size:14px;">
+                <strong>' . htmlspecialchars($c['track']) . '</strong><br>
+                <span style="font-size:12px;color:#888;">' . htmlspecialchars($c['courses_str']) . '</span>
+            </td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#555;font-size:14px;white-space:nowrap;">
+                ' . $mode_icon . '
+            </td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:15px;font-weight:900;color:#002D45;letter-spacing:2px;white-space:nowrap;">
+                ' . htmlspecialchars($c['camp_id'] ?? 'TBA') . '
             </td>
         </tr>';
 }
@@ -333,11 +372,13 @@ $body = '<!DOCTYPE html>
           <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8eaf0;border-radius:8px;overflow:hidden;margin-bottom:28px;">
             <tr style="background:#f8f9ff;">
               <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Name</th>
-              <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Learning Track</th>
+              <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Track &amp; Course</th>
+              <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Mode</th>
+              <th style="padding:10px 14px;text-align:left;font-size:13px;color:#555;font-weight:700;">Camp ID</th>
             </tr>
             ' . $child_rows_html . '
             <tr style="background:#f8f9ff;">
-              <td colspan="2" style="padding:10px 14px;font-size:13px;color:#555;">
+              <td colspan="4" style="padding:10px 14px;font-size:13px;color:#555;">
                 Package: <strong style="color:#f4821f;">' . htmlspecialchars($package) . '</strong>
               </td>
             </tr>
@@ -516,8 +557,16 @@ foreach ($children as $idx => $c) {
         <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;">' . htmlspecialchars($c['school']) . ' · ' . htmlspecialchars($c['grade']) . '</td>
       </tr>
       <tr>
+        <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Camp ID</td>
+        <td style="padding:7px 20px;font-size:16px;color:#002D45;border-bottom:1px solid #f4f5f8;font-weight:900;letter-spacing:2px;">' . htmlspecialchars($c['camp_id'] ?? 'TBA') . '</td>
+      </tr>
+      <tr>
         <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Track / Courses</td>
         <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;"><strong>' . htmlspecialchars($c['track']) . '</strong><br><span style="color:#666;font-size:13px;">' . htmlspecialchars($c['courses_str']) . '</span></td>
+      </tr>
+      <tr>
+        <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Mode</td>
+        <td style="padding:7px 20px;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f4f5f8;">' . (($c['mode'] ?? 'Physical') === 'Virtual' ? '&#128187; Virtual' : '&#127979; Physical') . '</td>
       </tr>
       <tr>
         <td style="padding:7px 20px;font-size:13px;color:#888;border-bottom:1px solid #f4f5f8;">Medical / Allergies</td>
@@ -620,5 +669,5 @@ $_SESSION['reg_success_email']    = $email;
 $_SESSION['reg_success_children'] = $num_children;
 $_SESSION['reg_success_child1']   = $children[0]['fn'];
 
-header('Location: ../thank-you.php');
+header('Location: ' . SITE_URL . '/thank-you.php');
 exit;

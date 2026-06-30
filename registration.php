@@ -392,7 +392,7 @@ include('includes/navbar.php');
 	line-height: 1.4 !important;
 }
 .courses-dd-menu label:hover { background: #fff5ed !important; }
-.courses-dd-menu input[type="checkbox"] {
+.courses-dd-menu input[type="radio"] {
 	width: 16px; height: 16px;
 	flex-shrink: 0;
 	accent-color: #f4821f;
@@ -503,6 +503,30 @@ include('includes/navbar.php');
 	.register-form .form-group textarea { font-size: 13px; height: 46px; padding: 8px 14px; }
 	/* Consent checkboxes: tighter */
 	.reg-section-card label { gap: 10px !important; }
+}
+
+/* Mode of Instruction card-picker */
+.mode-cards-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.mode-card {
+	flex: 1; min-width: 180px;
+	display: flex; flex-direction: column; align-items: center;
+	padding: 22px 18px;
+	border: 2.5px solid #dde1ea; border-radius: 14px;
+	cursor: pointer; transition: all .2s;
+	background: #fff; text-align: center; position: relative;
+}
+.mode-card:hover { border-color: #f4821f; box-shadow: 0 4px 18px rgba(244,130,31,0.12); }
+.mode-card.mode-selected { border-color: #f4821f; background: #fff8f0; box-shadow: 0 4px 18px rgba(244,130,31,0.18); }
+.mode-card.mode-error   { border-color: #e74c3c; box-shadow: 0 0 0 3px rgba(231,76,60,0.10); }
+.mode-card input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.mode-card-icon  { font-size: 34px; margin-bottom: 10px; line-height: 1; }
+.mode-card-title { font-size: 16px; font-weight: 800; color: #1a1a2e; margin-bottom: 5px; }
+.mode-card.mode-selected .mode-card-title { color: #f4821f; }
+.mode-card-desc  { font-size: 12px; color: #888; line-height: 1.5; }
+@media (max-width: 480px) {
+	.mode-card { min-width: 130px; padding: 16px 10px; }
+	.mode-card-title { font-size: 14px; }
+	.mode-card-desc  { font-size: 11px; }
 }
 </style>
 
@@ -637,7 +661,7 @@ function childSectionHTML(i, showDivider) {
 					'<select name="gender[' + i + ']" class="custom-select-box" required>' +
 						'<option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option>' +
 					'</select></div>' +
-				'<div class="col-lg-4 col-md-6 col-sm-12 form-group"><label>Date of Birth <span style="color:#e74c3c;">*</span></label><input type="date" name="date_of_birth[' + i + ']" min="2008-01-01" max="2019-12-31" required onchange="autoFillAge(' + i + ')"></div>' +
+				'<div class="col-lg-4 col-md-6 col-sm-12 form-group"><label>Date of Birth <span style="color:#e74c3c;">*</span></label><input type="date" name="date_of_birth[' + i + ']" min="2008-08-03" max="2019-08-03" required onchange="autoFillAge(' + i + ')"></div>' +
 				'<div class="col-lg-4 col-md-6 col-sm-12 form-group"><label>Age <span style="color:#e74c3c;">*</span></label>' +
 					'<select name="age[' + i + ']" id="age_select_' + i + '" class="custom-select-box" required onchange="updateCourses(' + i + ')">' + ageOpts + '</select></div>' +
 				'<div class="col-lg-6 col-md-6 col-sm-12 form-group"><label>Current School <span style="color:#e74c3c;">*</span></label><input type="text" name="school[' + i + ']" maxlength="255" required></div>' +
@@ -661,15 +685,27 @@ function childSectionHTML(i, showDivider) {
 						'<i class="fa-solid fa-chevron-down track-chevron"></i>' +
 					'</div></div>' +
 				'<div class="col-lg-6 col-md-12 col-sm-12 form-group">' +
-					'<label>Select Course(s) <span style="color:#e74c3c;">*</span> <span style="font-size:12px;color:#888;font-weight:500;">(Select all that apply)</span></label>' +
-					'<div class="courses-dd" id="courses-dd_' + i + '">' +
-						'<div class="courses-dd-trigger disabled" id="courses-trigger_' + i + '" onclick="toggleCoursesDropdown(' + i + ')">' +
-							'<span id="courses-label_' + i + '">Select a Learning Track first</span>' +
-							'<i class="fa-solid fa-chevron-down dd-chevron"></i>' +
-						'</div>' +
-						'<div class="courses-dd-menu" id="courses-menu_' + i + '"></div>' +
+					'<label>Select Course <span style="color:#e74c3c;">*</span> <span style="font-size:12px;color:#888;font-weight:500;">(Select one)</span></label>' +
+					'<select name="courses[' + i + ']" id="courses_select_' + i + '" class="custom-select-box" required>' +
+						'<option value="">— Select a Learning Track first —</option>' +
+					'</select>' +
+				'</div>' +
+				'<div class="col-lg-12 col-md-12 col-sm-12 form-group" style="margin-top:14px;">' +
+					'<label style="margin-bottom:14px;display:block;">Mode of Instruction <span style="color:#e74c3c;">*</span> <span style="font-size:12px;color:#888;font-weight:500;">(Select one)</span></label>' +
+					'<div class="mode-cards-row" id="mode_row_' + i + '">' +
+						'<label class="mode-card" id="mode_card_physical_' + i + '">' +
+							'<input type="radio" name="mode_of_instruction[' + i + ']" value="Physical" required>' +
+							'<span class="mode-card-icon">&#127979;</span>' +
+							'<span class="mode-card-title">Physical</span>' +
+							'<span class="mode-card-desc">In-person at our Ibadan campus</span>' +
+						'</label>' +
+						'<label class="mode-card" id="mode_card_virtual_' + i + '">' +
+							'<input type="radio" name="mode_of_instruction[' + i + ']" value="Virtual">' +
+							'<span class="mode-card-icon">&#128187;</span>' +
+							'<span class="mode-card-title">Virtual</span>' +
+							'<span class="mode-card-desc">Live online from anywhere</span>' +
+						'</label>' +
 					'</div>' +
-					'<input type="hidden" name="courses[' + i + ']" id="courses_hidden_' + i + '">' +
 				'</div>' +
 			'</div>' +
 		'</div>' +
@@ -743,47 +779,32 @@ function setChildCount(n) {
 }
 
 function updateCourses(i) {
-	var trackEl   = document.getElementById('learning_track_' + i);
-	var triggerEl = document.getElementById('courses-trigger_' + i);
-	var menuEl    = document.getElementById('courses-menu_' + i);
-	var labelEl   = document.getElementById('courses-label_' + i);
-	var hiddenEl  = document.getElementById('courses_hidden_' + i);
-	if (!trackEl || !triggerEl || !menuEl) return;
+	var trackEl  = document.getElementById('learning_track_' + i);
+	var selectEl = document.getElementById('courses_select_' + i);
+	if (!trackEl || !selectEl) return;
 
-	/* close and reset */
-	menuEl.classList.remove('open');
-	triggerEl.classList.remove('open', 'has-value');
-	if (hiddenEl) hiddenEl.value = '';
+	var prevSelection = selectEl.value;
+
+	selectEl.innerHTML = '';
 
 	var track = trackEl.value;
-
 	if (!track || !coursesDataByAge[track]) {
-		menuEl.innerHTML = '';
-		triggerEl.classList.add('disabled');
-		if (labelEl) labelEl.textContent = 'Select a Learning Track first';
+		selectEl.innerHTML = '<option value="">— Select a Learning Track first —</option>';
 		return;
 	}
 
-	/* resolve age → tier */
 	var ageEl   = document.getElementById('age_select_' + i);
 	var age     = ageEl ? parseInt(ageEl.value) : 0;
 	var hasAge  = age >= 7 && age <= 18;
 	var tier    = hasAge ? getAgeTier(age) : 'senior';
 	var courses = coursesDataByAge[track][tier];
+	var tierLabel = hasAge ? TIER_LABELS[tier] : 'All ages';
 
-	triggerEl.classList.remove('disabled');
-	if (labelEl) labelEl.textContent = 'Select courses…';
-
-	/* tier label header inside the dropdown */
-	var tierHtml = hasAge
-		? '<div style="padding:7px 18px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.9px;color:#f4821f;background:#fff5ed;border-bottom:1px solid #ffe4cc;pointer-events:none;">' + TIER_LABELS[tier] + '</div>'
-		: '';
-
-	var html = tierHtml;
+	var html = '<option value="">— Select a course (' + tierLabel + ') —</option>';
 	courses.forEach(function(c) {
-		html += '<label><input type="checkbox" value="' + c + '" onchange="syncCourses(' + i + ')">' + c + '</label>';
+		html += '<option value="' + c + '"' + (c === prevSelection ? ' selected' : '') + '>' + c + '</option>';
 	});
-	menuEl.innerHTML = html;
+	selectEl.innerHTML = html;
 }
 
 function autoFillAge(i) {
@@ -791,67 +812,25 @@ function autoFillAge(i) {
 	var ageEl = document.getElementById('age_select_' + i);
 	if (!dobEl || !ageEl || !dobEl.value) return;
 
-	/* calculate completed years */
-	var dob   = new Date(dobEl.value + 'T00:00:00');
-	var today = new Date();
-	var age   = today.getFullYear() - dob.getFullYear();
-	var dm    = today.getMonth() - dob.getMonth();
-	if (dm < 0 || (dm === 0 && today.getDate() < dob.getDate())) age--;
+	/* Calculate completed years as of camp start date (Aug 3 2026), matching server-side check */
+	var dob       = new Date(dobEl.value + 'T00:00:00');
+	var campStart = new Date('2026-08-03T00:00:00');
+	var age = campStart.getFullYear() - dob.getFullYear();
+	var dm  = campStart.getMonth() - dob.getMonth();
+	if (dm < 0 || (dm === 0 && campStart.getDate() < dob.getDate())) age--;
 
 	if (age >= 7 && age <= 18) {
 		ageEl.value = age;
-		/* flash the field green briefly to confirm auto-fill */
 		ageEl.style.transition = 'border-color 0.2s';
 		ageEl.style.borderColor = '#2ecc71';
 		setTimeout(function() { ageEl.style.borderColor = ''; }, 1200);
-		/* reload courses for the new age tier */
 		updateCourses(i);
 	} else {
 		ageEl.value = '';
 	}
 }
 
-function toggleCoursesDropdown(i) {
-	var triggerEl = document.getElementById('courses-trigger_' + i);
-	var menuEl    = document.getElementById('courses-menu_'   + i);
-	if (!triggerEl || !menuEl || triggerEl.classList.contains('disabled')) return;
 
-	var isOpen = menuEl.classList.contains('open');
-
-	/* close all open dropdowns first */
-	document.querySelectorAll('.courses-dd-menu.open').forEach(function(m) { m.classList.remove('open'); });
-	document.querySelectorAll('.courses-dd-trigger.open').forEach(function(t) { t.classList.remove('open'); });
-
-	if (!isOpen) {
-		menuEl.classList.add('open');
-		triggerEl.classList.add('open');
-	}
-}
-
-function syncCourses(i) {
-	var menuEl    = document.getElementById('courses-menu_'    + i);
-	var labelEl   = document.getElementById('courses-label_'   + i);
-	var hiddenEl  = document.getElementById('courses_hidden_'  + i);
-	var triggerEl = document.getElementById('courses-trigger_' + i);
-	if (!menuEl || !hiddenEl) return;
-
-	var checks = menuEl.querySelectorAll('input[type="checkbox"]:checked');
-	var vals   = Array.prototype.map.call(checks, function(c) { return c.value; });
-	hiddenEl.value = vals.join(',');
-
-	if (labelEl) {
-		if (vals.length === 0) {
-			labelEl.textContent = 'Select courses…';
-			if (triggerEl) triggerEl.classList.remove('has-value');
-		} else if (vals.length === 1) {
-			labelEl.textContent = vals[0];
-			if (triggerEl) triggerEl.classList.add('has-value');
-		} else {
-			labelEl.textContent = vals.length + ' courses selected';
-			if (triggerEl) triggerEl.classList.add('has-value');
-		}
-	}
-}
 
 function highlightPackage(pkg) {
 	if (earlyBirdExpired && pkg === 'early-bird') return;
@@ -890,6 +869,7 @@ var REG_OLD = <?php
             'emergency_contact'      => $ga('emergency_contact'),
             'emergency_phone'        => $ga('emergency_phone'),
             'emergency_relationship' => $ga('emergency_relationship'),
+            'mode_of_instruction'    => $ga('mode_of_instruction'),
         ];
     }
     echo json_encode(['num_children' => count($fn_arr), 'children' => $old_children]);
@@ -926,16 +906,17 @@ function repopulateFromOld(oldData) {
                     if (c.age) updateCourses(i);
                     if (c.courses) {
                         setTimeout(function(idx, csv) {
-                            var saved = csv.split(',').map(function(s){ return s.trim(); });
-                            var menu  = document.getElementById('courses-menu_' + idx);
-                            if (menu) {
-                                menu.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
-                                    if (saved.indexOf(cb.value) !== -1) cb.checked = true;
-                                });
-                                syncCourses(idx);
-                            }
+                            var sel = document.getElementById('courses_select_' + idx);
+                            if (sel) sel.value = csv.split(',')[0].trim();
                         }, 80, i, c.courses);
                     }
+                }
+            }
+            if (c.mode_of_instruction) {
+                var modeInput = document.querySelector('[name="mode_of_instruction[' + i + ']"][value="' + c.mode_of_instruction + '"]');
+                if (modeInput) {
+                    modeInput.checked = true;
+                    modeInput.closest('.mode-card').classList.add('mode-selected');
                 }
             }
         });
@@ -951,13 +932,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		highlightPackage(map[checked.value] || 'early-bird');
 	}
 
-	/* Close courses dropdowns when clicking outside */
-	document.addEventListener('click', function(e) {
-		if (!e.target.closest('.courses-dd')) {
-			document.querySelectorAll('.courses-dd-menu.open').forEach(function(m) { m.classList.remove('open'); });
-			document.querySelectorAll('.courses-dd-trigger.open').forEach(function(t) { t.classList.remove('open'); });
-		}
-	});
 
 	/* Render initial single-child form — or restore from saved data */
 	<?php if ($reg_old): ?>
@@ -965,6 +939,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	<?php else: ?>
 	setChildCount(1);
 	<?php endif; ?>
+
+	/* Mode card visual toggle — event delegation handles dynamically added children */
+	document.getElementById('registration-form').addEventListener('change', function(e) {
+		if (e.target.type !== 'radio' || e.target.name.indexOf('mode_of_instruction') === -1) return;
+		var nm = e.target.name;
+		document.querySelectorAll('[name="' + nm + '"]').forEach(function(r) {
+			r.closest('.mode-card').classList.remove('mode-selected', 'mode-error');
+		});
+		e.target.closest('.mode-card').classList.add('mode-selected');
+	});
 
 	/* Pre-submit child validation — runs in capture phase before form-validation.js */
 	document.getElementById('registration-form').addEventListener('submit', function(e) {
@@ -1010,11 +994,22 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 
 			/* courses */
-			var coursesEl = document.getElementById('courses_hidden_' + i);
-			if (coursesEl && !coursesEl.value) {
-				errs.push(childLabel + ': Please select at least one course.');
-				var trigEl = document.getElementById('courses-trigger_' + i);
-				if (trigEl) { trigEl.style.borderColor = '#e74c3c'; trigEl.style.boxShadow = '0 0 0 3px rgba(231,76,60,0.10)'; }
+			var coursesEl = document.getElementById('courses_select_' + i);
+			if (!coursesEl || !coursesEl.value) {
+				errs.push(childLabel + ': Please select a course.');
+				if (coursesEl) { coursesEl.style.borderColor = '#e74c3c'; coursesEl.style.boxShadow = '0 0 0 3px rgba(231,76,60,0.10)'; }
+			}
+
+			/* mode of instruction */
+			var modeChecked = document.querySelector('[name="mode_of_instruction[' + i + ']"]:checked');
+			if (!modeChecked) {
+				errs.push(childLabel + ': Please select a Mode of Instruction (Physical or Virtual).');
+				var modeRow = document.getElementById('mode_row_' + i);
+				if (modeRow) {
+					modeRow.querySelectorAll('.mode-card').forEach(function(c) {
+						c.classList.add('mode-error');
+					});
+				}
 			}
 		}
 

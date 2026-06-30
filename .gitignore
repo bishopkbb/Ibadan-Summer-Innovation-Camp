@@ -2,14 +2,24 @@
 #  Ibadan Summer Innovation Camp 2026 — .gitignore
 # ============================================================
 
-# ── Sensitive config files (contain real passwords & credentials) ──
-config/db.php
+# ── Credentials & sensitive config (NEVER commit these) ──
 config/app.php
-config/admin_hash.php
+config/db.php
+admin/config.php
 
 # ── Composer / PHP dependencies ──
 vendor/
 composer.phar
+
+# ── PHP session config (server-specific paths) ──
+.user.ini
+**/.user.ini
+
+# ── Archive files ──
+*.zip
+*.tar
+*.tar.gz
+*.rar
 
 # ── Internal documents ──
 ISC2026_Setup_Guide.docx
